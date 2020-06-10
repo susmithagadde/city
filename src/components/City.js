@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import  { Redirect } from 'react-router-dom';
 import Select from 'react-select';
 import ReactTable from 'react-table-6';
 import { Editor } from "@tinymce/tinymce-react";
@@ -159,6 +160,9 @@ class City extends Component {
 
     render() {
         const { selectedOption, cityData, matchData, customText, responseData, subject, buttonText, buttonLink, buttonDescription, selectedCategoryOption, category } = this.state; 
+        if(this.props.location.authSuccess === false || this.props.location.authSuccess === undefined ) {
+          return <Redirect to='/'  />
+         }
         let sum = 0;
         if(matchData.length > 0) {
             matchData.map(data => {
