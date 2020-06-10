@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Select from 'react-select';
-import ReactTable from 'react-table-6' 
+import ReactTable from 'react-table-6';
+import { Editor } from "@tinymce/tinymce-react";
 import PostData from "../data/post.js"; 
 import 'react-table-6/react-table.css'
 import './City.css';
@@ -15,7 +16,13 @@ class City extends Component {
             matchData: [],
             savedList:[],
             customText: '',
-            responseData: '',  
+            responseData: '', 
+            category:['delivered', 'bounced', 'open', 'deferred', 'click', 'blocked', 'invalid', 'unsubscribe'], 
+            subject:'',
+            buttonText:'',
+            buttonLink:'',
+            buttonDescription:'',
+            selectedCategoryOption:[],
         }
     }
 
@@ -50,49 +57,108 @@ class City extends Component {
                return results;
             })
             
-           
-            
             this.setState({matchData: concatArray, selectedOption: total});
         }
         else {
             this.setState({matchData: [], selectedOption: []});
-        }
-        
-          
+        }   
       };
 
-      handleTextChange = (e) => {
+      handleCategoryChange = selectedCategoryOption => {
+         if (selectedCategoryOption !== null){
+             const total = [...selectedCategoryOption];
+             this.setState({ selectedCategoryOption: total });
+         }
+         else {
+             this.setState({ selectedCategoryOption: []});
+         }
+
+      };
+
+      handleTextChange = (e, type) => {
+
+        switch (type) {
+            case "subject": 
+              this.setState({
+                subject: e.target.value
+              });
+              break;
+            case "btn-text": 
+              this.setState({
+                buttonText: e.target.value
+              });
+              break;
+            case "btn-link": 
+              this.setState({
+                buttonLink: e.target.value
+              });
+              break;
+            default: 
+              console.log("unknown category");
+              break;
+          };
           
-          this.setState({customText: e.target.value});
       }
 
 
       onSave = () => {
-          const { customText, selectedOption } = this.state;
+          const { customText, selectedOption, buttonDescription, buttonText, subject, selectedCategoryOption, buttonLink } = this.state;
         
          let finalMatch =  selectedOption.map(data => {
               return data.label;
           })
 
-          let requestOptions = {
-              method: 'POST',
-              headers: { "Access-Control-Allow-Origin": "https://api.traderight.co/sendBulkEmails", 'Content-Type': 'application/json'},
-              body: JSON.stringify({ cities: finalMatch, custom_text: customText })   
-        }
-           
-          fetch('https://cors-anywhere.herokuapp.com/https://api.traderight.co/sendBulkEmails', requestOptions)
-          .then(res => res.json())
-          .then(response => {
-              console.log("response", response);
-              this.setState({ responseData: response.message})
-          })
+          const categoryMatch = selectedCategoryOption.map(data => {
+            return data.label;
+        })
 
+        const totalData = {
+            subject: subject,
+            custom_text: customText,
+            button_desc: buttonDescription,
+            button_text: buttonText,
+            button_link: buttonLink,
+            category: categoryMatch,
+            cities: finalMatch,
+        }
+        
+
+           let requestOptions = {
+               method: 'POST',
+               headers: {'Content-Type': 'application/json' },
+               body: JSON.stringify(totalData)   
+         }
+           
+           fetch('https://api.traderight.co/sendBulkEmails', requestOptions)
+           .then(res => res.json())
+           .then(response => {
+               this.setState({ responseData: response.message})
+           })
+
+      }
+
+      onChange = (e, type) => {
+        switch (type) {
+            case "btn-desc": 
+              this.setState({
+                buttonDescription: e.target.getContent()
+              });
+              break;
+            case "custom-text": 
+              this.setState({
+                customText: e.target.getContent()
+              });
+              break;
+            default: 
+              console.log("unknown category");
+              break;
+          };
+        
       }
 
 
     render() {
-        const { selectedOption, cityData, matchData, customText, responseData } = this.state; 
-  
+        const { selectedOption, cityData, matchData, customText, responseData, subject, buttonText, buttonLink, buttonDescription, selectedCategoryOption, category } = this.state; 
         let sum = 0;
         if(matchData.length > 0) {
             matchData.map(data => {
@@ -111,33 +177,60 @@ class City extends Component {
            Footer: <span>{sum}</span> 
            }]
 
+           const categoryList = category.map((data) => { 
+              return {value: data, label: data}
+          });
+
+          const condition = !customText || matchData.length === 0 || !buttonDescription || !buttonText|| !subject|| !selectedCategoryOption.length === 0 || !buttonLink;
         return(
-            <section>
-                {/* <h2>City</h2> */}
+            <section className="mail-body">
+                <section className="mail-container">
                 <section className="select-dropdown">
                 <Select
                     value={selectedOption}
+                    placeholder={<div>Select City</div>}
                     isMulti
                     className="select-city"
                     onChange={this.handleChange}
                     options={cityData}
                 />
-                <section className="input-group">
-                    <div className="row">
-                        <div className="col-75">
-                        <input type="text" id="custom-text" name="custom" placeholder="Custom Text" onChange={this.handleTextChange}/>
-                        </div>
-                    </div>
-                    <button className="btn save" disabled={!customText || matchData.length === 0} onClick={this.onSave}>Save</button>
-                </section>
+                <Select
+                    value={selectedCategoryOption}
+                    placeholder={<div>Select Category</div>}
+                    isMulti
+                    className="select-category"
+                    onChange={this.handleCategoryChange}
+                    options={categoryList}
+                />
+                <input type="text" id="subject" name="subject" placeholder="Subject" onChange={(e) => this.handleTextChange(e,'subject')}/>
+               
                 
+                <input type="text" id="button-text" name="button-text" placeholder="Button Text" onChange={(e) => this.handleTextChange(e,'btn-text')}/>
+                <Editor
+                initialValue="<p style='color:grey'>Button Description</p>"
+                init={{
+                    plugins: 'link image code',
+                    toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | code'
+                }}
+                onChange={(e) => this.onChange(e, 'btn-desc')}
+                />
+                <input type="text" id="button-link" name="button_link" placeholder="Button Link" onChange={(e) => this.handleTextChange(e,'btn-link')}/>
+                <Editor
+                initialValue="<p style='color:grey'>Custom Text</p>"
+                init={{
+                    plugins: 'link image code',
+                    toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | code'
+                }}
+                onChange={(e) => this.onChange(e, 'custom-text')}
+                />
+                <button className="btn save" disabled={condition} onClick={this.onSave}>Send</button> 
                 </section>  
                 <section className="table-section">
                {matchData.length > 0 && <ReactTable  
                   data={matchData}  
                   columns={columns}  
                   defaultPageSize = {matchData.length}
-                  pageSize ={matchData.length > 10 ? 10 : matchData.length}
+                  pageSize ={matchData.length > 10 ? 10 : 10}
                   pageSizeOptions = {[10, 20, 30]}
                     
               /> } 
@@ -145,6 +238,8 @@ class City extends Component {
                 </section>
                 {responseData !== '' && responseData}
             </section>
+            </section>
+            
         )
     }
 }

@@ -1,35 +1,39 @@
-.select-dropdown{
-    margin: auto;
-    width: 50%;
-    padding-top: 5%;
-    
+.mail-container{
+  display: flex;
+  justify-content: space-evenly;
 }
+
+.select-dropdown{
+  width: 40%;
+  padding-top: 5%;
+}
+  
 .input-group{
     display: flex;
     width: 100%;
-    /* justify-content: center; */
     margin-top: 3%;
-    /* margin-left: 1%; */
 }
-.select-city{
+.select-city, .select-category{
     width: 100%;
     margin: auto;
+    margin-bottom: 3%;
 }
 .table-section {
-    padding-top: 5%;
-    width: 60%;
-    margin: auto;
+  padding-top: 5%;
+  width: 30%;
+  margin-top: auto;
+  margin-bottom: auto;
 }
 
 .btn{
-	background:white;
+  background:white;
+  display: block;
+  margin: 20px auto;
 	color:black;
 	border:1px solid black;
 	padding: 0.5em 2em;
 	text-decoration:none;
-    margin: 0 0 0 10px;
-	display:inline-block;
-	cursor:pointer;
+  cursor:pointer;
 }
 .btn:disabled {
     cursor: not-allowed;
@@ -42,7 +46,6 @@
   }
 
   .row {
-    /* padding: 0 10px; */
     width: 100%;
   }
   
@@ -58,6 +61,18 @@
   label {
     padding: 12px 12px 12px 0;
     display: inline-block;
+  }
+
+  #subject, #button-text, #button-link, .mce-tinymce {
+    margin-bottom: 3% !important;
+  }
+
+  .mce-statusbar .mce-container-body {
+    display: none !important;
+  }
+
+  #my_id{
+    color: gray !important;
   }
   
   
