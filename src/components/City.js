@@ -18,7 +18,7 @@ class City extends Component {
             savedList:[],
             customText: '',
             responseData: '', 
-            category:['delivered', 'bounced', 'open', 'deferred', 'click', 'blocked', 'invalid', 'unsubscribe'], 
+            category:['delivered', 'new', 'bounced', 'open', 'deferred', 'click', 'blocked', 'invalid', 'unsubscribe'], 
             subject:'',
             buttonText:'',
             buttonLink:'',
