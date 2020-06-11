@@ -33,7 +33,7 @@ class Validate extends Component {
         .then(res => res.json())
         .then(response => {
             
-            if(response.status === 'success'){console.log("response", response.status);
+            if(response.status === 'success'){
                 this.setState({ responseData: response.message, authSuccess: true, status: true})
             }
             else{
