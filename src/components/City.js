@@ -200,7 +200,7 @@ class City extends Component {
                 <div className="appOverlay" />
                 <div className="loader" />
               </div>}
-              {responseData === '' && <div>
+              {responseData !== '' && <div>
                 <div className="appOverlay" />
                 <div class="success">Mail Sent</div>
                 <button className="confirm sent" onClick={() => this.onConfirm()}>Ok</button>
