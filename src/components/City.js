@@ -24,6 +24,8 @@ class City extends Component {
             buttonLink:'',
             buttonDescription:'',
             selectedCategoryOption:[],
+            loading: false,
+            error:false,
         }
     }
 
@@ -123,7 +125,7 @@ class City extends Component {
             cities: finalMatch,
         }
         
-
+        this.setState({ loading: true });
            let requestOptions = {
                method: 'POST',
                headers: {'Content-Type': 'application/json' },
@@ -133,8 +135,10 @@ class City extends Component {
            fetch('https://api.traderight.co/sendBulkEmails', requestOptions)
            .then(res => res.json())
            .then(response => {
-               this.setState({ responseData: response.message})
-           })
+               this.setState({ responseData: response.message, loading:false, error:false})
+           }).catch(error => {
+            this.setState({loading:false, error:true})
+          });
 
       }
 
@@ -157,9 +161,13 @@ class City extends Component {
         
       }
 
+      onConfirm =() => {
+        window.location.reload(false);
+      }
+
 
     render() {
-        const { selectedOption, cityData, matchData, customText, responseData, subject, buttonText, buttonLink, buttonDescription, selectedCategoryOption, category } = this.state; 
+        const { selectedOption, cityData, matchData, customText, error, loading, responseData, subject, buttonText, buttonLink, buttonDescription, selectedCategoryOption, category } = this.state; 
         if(this.props.location.authSuccess === false || this.props.location.authSuccess === undefined ) {
           return <Redirect to='/'  />
          }
@@ -188,6 +196,20 @@ class City extends Component {
           const condition = !customText || matchData.length === 0 || !buttonDescription || !buttonText|| !subject|| !selectedCategoryOption.length === 0 || !buttonLink;
         return(
             <section className="mail-body">
+              { loading && <div>
+                <div className="appOverlay" />
+                <div className="loader" />
+              </div>}
+              {responseData !== '' && <div>
+                <div className="appOverlay" />
+                <div class="success">Mail Sent</div>
+                <button className="confirm sent" onClick={() => this.onConfirm()}>Ok</button>
+              </div>}
+              {error && <div>
+                <div className="appOverlay" />
+                <div class="error-msg">Mail Not Sent</div>
+                <button className="confirm err" onClick={() => this.onConfirm()}>Ok</button>
+              </div>}
                 <section className="mail-container">
                 <section className="select-dropdown">
                 <Select

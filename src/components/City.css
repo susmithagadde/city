@@ -99,3 +99,81 @@
    text-align: left;
    font-size: 12px;
  }
+
+ .loader {
+  border: 5px solid #fff;
+  border-top: 5px solid #3f51b5;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 2s linear infinite;
+  position: fixed;
+  top: 45%;
+  left: 48%;
+  z-index: 1302;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.appOverlay {
+  position: absolute;
+  width: 100%;
+  height: 106%;
+  background-color: gray;
+  padding: 10px;
+  opacity: 0.5;
+  z-index: 1301;
+}
+
+ .success, .error-msg {
+  border: 1px solid;
+  margin: 10px 0px;
+  padding: 15px 10px 11px 19px;
+  background-repeat: no-repeat;
+  background-position: 10px center;
+  position: fixed;
+  top: 45%;
+  left: 48%;
+  z-index: 1302;
+  height: 130px;
+  width: 200px;
+  text-align: center;
+}
+
+.success {
+  color: #4F8A10;
+  background-color: #DFF2BF;
+  background-image: url('https://i.imgur.com/Q9BGTuy.png');
+  background-position: center;
+}
+.error-msg{
+  color: #D8000C;
+  background-color: #FFBABA;
+  background-image: url('https://i.imgur.com/GnyDvKN.png');
+  background-position: center;
+}
+.err {
+  color: #D8000C;
+  border: 1px solid #D8000C;
+}
+.sent {
+  color: #4F8A10;
+  border: 1px solid #4F8A10;
+}
+.confirm {
+  background: transparent;
+  display: block;
+  /* color: black;
+  border: 1px solid black; */
+  padding: 0.5em 1em;
+  text-decoration: none;
+  cursor: pointer;
+  position: fixed;
+  top: 55%;
+  left: 52%;
+  z-index: 1302;
+  margin: 20px;
+}
