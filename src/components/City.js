@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import  { Redirect } from 'react-router-dom';
+import  { Redirect, withRouter } from 'react-router-dom';
 import Select from 'react-select';
 import ReactTable from 'react-table-6';
 import { Editor } from "@tinymce/tinymce-react";
@@ -162,7 +162,7 @@ class City extends Component {
       }
 
       onConfirm =() => {
-        window.location.reload(false);
+        this.props.history.push("/");
       }
 
 
@@ -200,7 +200,7 @@ class City extends Component {
                 <div className="appOverlay" />
                 <div className="loader" />
               </div>}
-              {responseData !== '' && <div>
+              {responseData === '' && <div>
                 <div className="appOverlay" />
                 <div class="success">Mail Sent</div>
                 <button className="confirm sent" onClick={() => this.onConfirm()}>Ok</button>
@@ -270,4 +270,4 @@ class City extends Component {
     }
 }
 
-export default City;
+export default withRouter(City);
