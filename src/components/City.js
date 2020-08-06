@@ -362,15 +362,16 @@ class City extends Component {
                     options={categoryList}
                     styles={colourStyles}
                 />
-                {subsEnabled && <Select
+                 <Select
                     value={selectedSubcription}
                     placeholder={<div>Select Subscription Status</div>}
                     isMulti
+                    isDisabled={!subsEnabled}
                     className="select-subscription"
                     onChange={this.handleSubscriptionChange}
                     options={SubscriptionList}
                     styles={colourStyles}
-                />}
+                />
                 <input type="text" id="subject" name="subject"  placeholder="Subject" onChange={(e) => this.handleTextChange(e,'subject')}/>
                 <input type="text" id="from-email" name="from-email" value={fromEmail} placeholder="From (email)" onChange={(e) => this.handleTextChange(e,'from-email')}/>
                 <input type="text" id="from-name" name="from-name" value={fromName} placeholder="From (name)" onChange={(e) => this.handleTextChange(e,'from-name')}/>   
