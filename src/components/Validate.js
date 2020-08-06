@@ -41,6 +41,8 @@ class Validate extends Component {
                 this.setState({ status: false })
             }
             
+        }).catch(error => {
+            console.log(error);
         })
     }
 
@@ -56,7 +58,7 @@ class Validate extends Component {
        
         return(
             <section className="validate-container">
-               <input type="text" id="password" name="password" placeholder="Enter token" autocomplete="off" onChange={(e) => this.handleTextChange(e)}/>
+               <input type="text" id="password" name="password" placeholder="Enter token" autoComplete="off" onChange={(e) => this.handleTextChange(e)}/>
                {status === false && <p className="error">Incorrect password</p>}
                <button className="btn save" disabled={!password}  onClick={this.onValidate}>Log In</button> 
             </section>
