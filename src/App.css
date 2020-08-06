@@ -36,3 +36,7 @@
     transform: rotate(360deg);
   }
 }
+
+.tox .tox-notification--warn, .tox .tox-notification--warning{
+  display: none !important;
+}
