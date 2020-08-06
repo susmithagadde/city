@@ -396,13 +396,15 @@ class City extends Component {
                    <textarea value={rawHtml} onChange={(e)=>this.onChangeRawHtMl(e)}placeholder="Raw HTML" rows="20" name="comment[text]" id="comment_text" cols="40" autoComplete="off"  aria-autocomplete="list" aria-haspopup="true"></textarea>
                   :
                   <Editor
-                  initialValue={emailText ?  emailText  : "<p style='color:grey'>Email Editor</p>"}
+                  initialValue={emailText && emailText}
+                  
                    init={{
                      height: 600,
                      statusbar: false,
                      plugins: [
                       'link image code', 'textcolor',
                      ],
+                     placeholder: "Email Editor",
                      toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | code | currentdate | forecolor backcolor | Info ',
                      content_css: 'www.tiny.cloud/css/codepen.min.css',
                      setup: function(editor) { 
