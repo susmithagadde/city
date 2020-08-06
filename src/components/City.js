@@ -395,7 +395,7 @@ class City extends Component {
                    <textarea value={rawHtml} onChange={(e)=>this.onChangeRawHtMl(e)}placeholder="Raw HTML" rows="20" name="comment[text]" id="comment_text" cols="40" autoComplete="off"  aria-autocomplete="list" aria-haspopup="true"></textarea>
                   :
                   <Editor
-                  initialValue={emailText ? '<div style="width: 100%;max-width: 600px;margin: auto;">' + emailText + '</div>' : "<p style='color:grey'>Email Editor</p>"}
+                  initialValue={emailText ?  emailText  : "<p style='color:grey'>Email Editor</p>"}
                    init={{
                      height: 600,
                      statusbar: false,
