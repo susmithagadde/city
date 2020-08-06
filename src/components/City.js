@@ -53,14 +53,14 @@ const colourStyles = {
       ...base,
       color: "#000"
     }),
-    option: (base, state) => ({
-      ...base,
-      color: "#f4f7f8 !important",
-      backgroundColor: '#e8eeef !imporatnt'
-    }),
+    // option: (base, state) => ({
+    //   ...base,
+    //   color: "#f4f7f8 !important",
+    //   backgroundColor: '#e8eeef !imporatnt'
+    // }),
   menu: styles => ({ ...styles, backgroundColor: '#e8eeef' }),
   control: styles => ({ ...styles, backgroundColor: '#e8eeef' }),
-  // option: styles => ({ ...styles, color: '#f4f7f8 !imporatnt' }),
+   option: styles => ({ ...styles, color: '#f4f7f8 !imporatnt' }),
 };
 
 
