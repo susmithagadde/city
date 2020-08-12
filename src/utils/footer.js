@@ -381,3 +381,12 @@ export const getHtmlElement = (mainELe, footerHtml) => {
       </center></body></html>`
 }
 
+export const blogFooter = `<p>I have developed a strategy where I use advanced data science and machine learning to score corporate governance for really small companies with limited reporting. I am attempting to find multi-baggers and create a high conviction basket which is expected to give venture capital like upside but with the advantage of transparency and liquidity associated with listed companies.</p>
+                
+                
+<h2 className="check-out">Check our Listed Venture Capital portfolio on <a href="https://lotusdew.smallcase.com/" target="_blank" rel="noopener noreferrer" >https://lotusdew.smallcase.com/</a></h2>
+<p>Follow us on twitter: <a href="https://twitter.com/LotusDewHQ" target="_blank" rel="noopener noreferrer" ><span>https://twitter.com/LotusDewHQ</span></a></p>         
+<p>How to proceed:</p>
+<p>Email me back if you are interested so that I can guide you.</p>
+<p>If you already have an account with HDFC, Kotak, IIFL, Axis, Edelweiss you can directly subscribe on <a href="https://lotusdew.smallcase.com/" target="_blank" rel="noopener noreferrer" >https://lotusdew.smallcase.com/</a></p>
+<blockquote>If you want to open a new brokerage account – I can help you with that as well.<cite>Abrams</cite></blockquote>`;
