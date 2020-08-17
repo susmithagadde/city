@@ -525,7 +525,7 @@ class City extends Component {
                   <label className="radio-option" For="radio2">Upload Image</label>
                   </div>
                 </div>
-             {selectedRadioOption === "Yes" && <input type="text" id="url" name="url"  placeholder="Image URL" onChange={(e) => this.handleBlogTextChange(e,'url')}/>}
+             {selectedRadioOption === "Yes" && <input type="text" id="url" name="url" value={blogImgUrl} placeholder="Image URL" onChange={(e) => this.handleBlogTextChange(e,'url')}/>}
              {selectedRadioOption === "No" && <input type="file" id="upload" onChange= {(e) => this.onUpload(e)} />}
              {selectedRadioOption === "Yes" && 
              <img src={blogImgUrl} onError={this.onError} width="50px" height="50px" style={{display:'none'}} />}
