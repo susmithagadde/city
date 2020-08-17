@@ -528,7 +528,7 @@ class City extends Component {
              {selectedRadioOption === "Yes" && <input type="text" id="url" name="url" value={blogImgUrl} placeholder="Image URL" onChange={(e) => this.handleBlogTextChange(e,'url')}/>}
              {selectedRadioOption === "No" && <input type="file" id="upload" onChange= {(e) => this.onUpload(e)} />}
              {selectedRadioOption === "Yes" && 
-             <img src={blogImgUrl} onError={this.onError} width="50px" height="50px" style={{display:'none'}} />}
+             <img src={blogImgUrl} onError={this.onError} width="50px" height="50px" style={{display:'none'}} alt="img"/>}
                 {((imageURlErrored && selectedRadioOption === "Yes")) && <div className="file-msg">Please add Valid Image URL</div>}
                 {(imageError && selectedRadioOption === 'No') && <div className="file-msg">Please make sure your file is in png, jpeg or jpg format and less than 3 MB</div>}
              <button className="btn save" disabled={blogCondition} onClick={this.onSaveBlog}>Generate</button>
