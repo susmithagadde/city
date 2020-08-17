@@ -412,7 +412,7 @@ class City extends Component {
       }
 
 
-    render() {
+    render() { 
         const { selectedOption, selectedRadioOption, imageURlErrored, footerRender, rawHtml, image, selectedType, typeList, emailText, toggleList, cityData, matchData, loading, 
           responseData, subject, fromName, fromEmail, subscriptionStatus, selectedCategoryOption, category, 
           selectedSubcription, subsEnabled, imageError, blogTitle, blogSubTitle, blogAuthor, blogImgUrl, } = this.state; 
