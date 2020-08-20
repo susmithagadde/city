@@ -1,68 +1,22 @@
 import React, { Component } from 'react';
 import  { Redirect, withRouter } from 'react-router-dom';
 import Select from 'react-select';
-// import ReactTable from 'react-table-6';
-import { Editor } from "@tinymce/tinymce-react";
+import ReactTable from 'react-table-6';
+// import { Editor } from "@tinymce/tinymce-react";
 import moment from 'moment';
 import Tabs from "./Tabs";
 import Modal from "./Modal";
 import Panel from "./Panel";
+import ModalContent from "./ModalContent/ModalContent";
+import Email from "./Email/Email";
+import Blog from "./Blog/Blog";
+import PanelContent from "./PanelContent/PanelContent";
 import PostData from "../data/post.js"; 
 import { footerHtml, buttonHtml, getHtmlElement, blogFooter } from "../utils/footer";
-// import 'react-table-6/react-table.css'
+import { modalStyle, mainStyle, colourStyles } from "../utils/style";
+import Appointments from "./Appointments/Appointments";
+import 'react-table-6/react-table.css'
 import './City.css';
-
-// overwrite style
-const modalStyle = {
-	overlay: {
-		backgroundColor: "rgba(0, 0, 0,0.5)"
-	}
-};
-
-const mainStyle = {
-	app: {
-		margin: "120px 0"
-	},
-	button: {
-		backgroundColor: "#408cec",
-		border: 0,
-		padding: "12px 20px",
-		color: "#fff",
-		margin: "0 auto",
-		width: 150,
-		display: "block",
-		borderRadius: 3
-	}
-};
-
-const colourStyles = {
-  container: (base, state) => ({
-      ...base,
-    }),
-    valueContainer: (base, state) => ({
-      ...base,
-    }),
-    multiValue:(base, state) => ({
-      ...base,
-      backgroundColor: "#f4f7f8"
-    }),
-    indicatorSeparator: (base, state) => ({
-      ...base,
-      backgroundColor: "#fff"
-    }),
-    dropdownIndicator: (base, state) => ({
-      ...base,
-      color: "#000"
-    }),
-    // option: (base, state) => ({
-    //   ...base,
-    //   color: "#f4f7f8 !important",
-    //   backgroundColor: '#e8eeef !imporatnt'
-    // }),
-  menu: styles => ({ ...styles, backgroundColor: '#e8eeef' }),
-  control: styles => ({ ...styles, backgroundColor: '#e8eeef' }),
-   option: styles => ({ ...styles, color: '#f4f7f8 !imporatnt' }),
-};
 
 
 class City extends Component {
@@ -92,7 +46,7 @@ class City extends Component {
             rawHtml:'',
             isModalOpen: false,
             isInnerModalOpen: false,
-            typeList: ['email', 'blog'],
+            typeList: ['email', 'blog', 'Appointments'],
             selectedType:'blog',
             blogTitle:'',
             blogSubTitle:'',
@@ -103,6 +57,13 @@ class City extends Component {
             imageError: false,
             footerRender:blogFooter,
             imageURlErrored: false,
+            scheduleList:[],
+            selectedSentimentType:'Positive',
+            Sentiment:['Highly Positive', 'Positive', 'Neutral', 'Negative', 'Extremely Negative'],
+            attendedId:0,
+            comments:'',
+            callStatus:'',
+            savedData:[],
         }
     }
 
@@ -345,10 +306,18 @@ class City extends Component {
       }
 
       closeModal = () => {
+        const { responseData, selectedType } = this.state;
         this.setState({
-          isModalOpen: false
+          isModalOpen: false,
+          responseData:'',
+          savedData:'',
         });
-        this.props.history.push("/");
+        if(selectedType === 'Appointments') {
+          responseData !== ''  &&  this.props.history.push("/");
+        }
+        else{
+          this.props.history.push("/");
+        }
       }
     
       openModal = () => {
@@ -360,6 +329,11 @@ class City extends Component {
       handleChangeTypes = selectedOption => {
         if(selectedOption.value === 'email'){
               this.setState({footerRender: footerHtml})
+        }
+        else if(selectedOption.value === 'Appointments') {
+          const startDate = new Date();
+          const endDate = moment(startDate, "YYYY-MM-DD").add(7, 'days');
+          this.onSubmitDate(startDate, endDate);
         }
         else{
           this.setState({footerRender: blogFooter})
@@ -411,14 +385,105 @@ class City extends Component {
         }
       }
 
+      onSubmitDate = (startDate, EndDate) => {   
+          const totalData = {
+            fromDate: moment(startDate).format("YYYY-MM-DD"),
+            toDate: moment(EndDate).format("YYYY-MM-DD"),
+        }
+          const jsonFormat =  JSON.stringify(totalData);
+           this.setState({ loading: true });
+
+            let requestOptions = {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'},
+                body: jsonFormat  
+          }
+          
+            fetch('https://dev-api.lotusdew.in/api/schedule-list', requestOptions)
+            .then(res => res.json())
+            .then(response => {
+                this.setState({ scheduleList: response.data, loading:false, error:false}) 
+            }).catch(error => {
+            this.setState({loading:false, error:true, scheduleList: ''})
+          });
+
+      }
+
+      onsaveFeedback = () => {
+        const { attendedId, comments, selectedSentimentType, callStatus } = this.state;
+       
+        const totalData = {
+          call_status: "Completed",
+          comments: comments,
+          sentiment: selectedSentimentType,
+          id:attendedId.toString()
+         }
+
+        const jsonFormat =  JSON.stringify(totalData);
+         this.setState({ loading: true, responseData:'' });
+
+          let requestOptions = {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'},
+              body: jsonFormat  
+        }
+        
+          fetch('https://dev-api.lotusdew.in/api/schedule-update', requestOptions)
+          .then(res => res.json())
+          .then(response => {
+              this.setState({ responseData: response.message, loading:false, error:false}) 
+          }).catch(error => {
+          this.setState({loading:false, error:true, responseData: error.message})
+        });
+      }
+
+      onAttend = (row) => {
+        if(row.original.call_status === 'Completed'){
+          const totalData = {
+            id:row.original.id.toString()
+          }
+  
+          const jsonFormat =  JSON.stringify(totalData);
+           this.setState({ loading: true, responseData:'' });
+  
+            let requestOptions = {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'},
+                body: jsonFormat  
+          }
+          
+            fetch('https://dev-api.lotusdew.in/api/schedule-get', requestOptions)
+            .then(res => res.json())
+            .then(response => {
+                this.setState({ savedData: response.data, loading:false, error:false}) 
+            }).catch(error => {
+            this.setState({loading:false, error:true, savedData: error.message})
+          });
+        }
+        this.openModal();
+         this.setState({attendedId: row.original.id, callStatus: row.original.call_status})
+      }
+
+      handleChangeSentiment = selectedOption => {
+        this.setState({selectedSentimentType: selectedOption.value});
+      }
+
+
+    onComment = e => {
+      this.setState({comments: e.target.value});
+    }
+
+
 
     render() { 
         const { selectedOption, selectedRadioOption, imageURlErrored, footerRender, rawHtml, image, selectedType, typeList, emailText, toggleList, cityData, matchData, loading, 
-          responseData, subject, fromName, fromEmail, subscriptionStatus, selectedCategoryOption, category, 
-          selectedSubcription, subsEnabled, imageError, blogTitle, blogSubTitle, blogAuthor, blogImgUrl, } = this.state; 
-         const types =  typeList.map(list => {
-            return {value: list, label: list}
-          })
+          responseData, subject, fromName, fromEmail, selectedSentimentType, subscriptionStatus, selectedCategoryOption, category, scheduleList, Sentiment,
+          selectedSubcription, subsEnabled, savedData, comments, imageError, blogTitle, blogSubTitle, blogAuthor, blogImgUrl, callStatus, attendedId, } = this.state; 
+         const types =  typeList.map(list => {return {value: list, label: list}});
+         const feedbackTypes =  Sentiment.map(list => {return {value: list, label: list}});
           const EditorName = selectedType === 'email' ? 'Email Content': 'Blog Content';
           if(this.props.location.authSuccess === false || this.props.location.authSuccess === undefined ) {
             return <Redirect to='/'  />
@@ -431,15 +496,53 @@ class City extends Component {
                   return sum;
               })
           }
-           const categoryList = category.map((data) => { 
-              return {value: data, label: data}
-          });
-          const SubscriptionList = subscriptionStatus.map(data => {
-            return {value:data, label:data}
-          });
+           const categoryList = category.map((data) => { return {value: data, label: data}});
+          const SubscriptionList = subscriptionStatus.map(data => {return {value:data, label:data}});
           const htmlString = toggleList ? rawHtml: emailText;
           const blogCondition =  !blogTitle || !blogSubTitle|| !blogAuthor|| (!image && !blogImgUrl) || !htmlString;
          const condition =  matchData.length === 0 || !fromName|| !subject|| (subsEnabled && selectedSubcription.length === 0) || selectedCategoryOption.length === 0 || !fromEmail || (!rawHtml && !emailText);
+         const columns = [
+          {
+            Header: 'Name',
+            accessor: 'name' 
+          },
+          {
+            Header: 'Phone',
+            accessor: 'phone',
+          },
+          {
+            Header: 'Email',
+            accessor: 'email',
+          },
+          {
+            Header: 'Date',
+            accessor: 'date',
+            Cell: (row) => (<span>{moment(row.value).format("DD MMM, YYYY")}</span> ),
+          },
+          {
+            Header: 'Slot',
+            accessor: 'slot',
+          },
+          {
+            Header: 'Created At',
+            accessor: 'created_at',
+             Cell: (row) => (<span>{moment(row.value).format("DD MMM, YYYY")}</span> ),
+          },
+          {
+            Header: 'Call Status',
+            accessor: 'call_status',
+            Cell: (row) => ( <div className='callStatus-container'>
+              {/* {row.value} */}
+               {row.value  !== 'Completed' 
+               ?
+               <button className="attended-btn"><i class="fa fa-calendar" aria-hidden="true" aria-hidden="true" onClick={() =>this.onAttend(row)}>&nbsp;Attended</i></button>
+               :
+               <button className="attended-btn"><i class="fa fa-calendar-check-o" aria-hidden="true" onClick={() =>this.onAttend(row)}>&nbsp;Completed</i></button>
+            //  <button className="btn save"  onClick={() =>this.onAttend(row)}>Attended</button>
+             }</div> ),
+   
+          },
+        ];
          return(
             <section className="mail-body">
               <Modal
@@ -447,20 +550,69 @@ class City extends Component {
                 closeModal={this.closeModal}
                 style={modalStyle}
               >
-                <p>{responseData ? responseData : 'Something Went Wrong..'}</p>
+                <ModalContent 
+                selectedType={selectedType}
+                scheduleList={scheduleList}
+                responseData={responseData}
+                feedbackTypes={feedbackTypes}
+                handleChangeSentiment={this.handleChangeSentiment}
+                callStatus={callStatus}
+                savedData={savedData}
+                selectedSentimentType={selectedSentimentType}
+                comments={comments}
+                onComment={(e)=>this.onComment(e)}
+                mainStyle={mainStyle}
+                closeModal={this.closeModal}
+                onsaveFeedback={this.onsaveFeedback}
+                />
+               {/* {(selectedType === 'Appointments' && scheduleList.length > 0 && responseData === '' ) ? 
+               <div className="feedback-flex">
+               <Select
+                    defaultValue={feedbackTypes[1]}
+                    className="select-feedback"
+                    onChange={this.handleChangeSentiment}
+                    isDisabled={callStatus === 'Completed'}
+                    options={feedbackTypes}
+                    styles={colourStyles}
+                    value={savedData.length !== 0 ? {value: savedData.sentiment, label: savedData.sentiment} : {value: selectedSentimentType, label: selectedSentimentType}}
+                />
+                 <textarea disabled={callStatus === 'Completed'} value={savedData.length !== 0  ? savedData.comments : comments} placeholder="Comment" rows="4"  cols="45" autoComplete="off" onChange={(e)=>this.onComment(e)}></textarea>
+                 {savedData.length !== 0  ? <button
+                 style={{
+                   ...mainStyle.button,
+                   margin: 0,
+                   width: "auto",
+                   marginTop: 10,
+                   backgroundColor:'#24a557',
+                 }}
+                 onClick={this.closeModal}
+               >
+                 Close
+               </button>:<button style={{
+                   ...mainStyle.button,
+                   margin: 0,
+                   width: "auto",
+                   marginTop: 10,
+                   backgroundColor:'#24a557',
+                 }}  onClick={this.onsaveFeedback}>Save</button>} 
+               </div>:  
+               <>
+               <p>{responseData ? responseData : 'Something Went Wrong..'}</p>
 
-                <button
-                  style={{
-                    ...mainStyle.button,
-                    margin: 0,
-                    width: "auto",
-                    marginTop: 10,
-                    backgroundColor:'#24a557',
-                  }}
-                  onClick={this.closeModal}
-                >
-                  Close
-                </button>
+               <button
+                 style={{
+                   ...mainStyle.button,
+                   margin: 0,
+                   width: "auto",
+                   marginTop: 10,
+                   backgroundColor:'#24a557',
+                 }}
+                 onClick={this.closeModal}
+               >
+                 Close
+               </button>
+               </>
+               }  */}
               </Modal>
               { loading && <div>
                 <div className="appOverlay" />
@@ -476,69 +628,127 @@ class City extends Component {
                     styles={colourStyles}
                 />
                 {selectedType === 'email' ? 
-                <>
-                <Select
-                  value={selectedOption}
-                  placeholder={<div>Select City</div>}
-                  isMulti
-                  className="select-city"
-                  onChange={this.handleChange}
-                  options={cityData}
-                  styles={colourStyles}
-              />
-              <Select
-                  value={selectedCategoryOption}
-                  placeholder={<div>Select Category</div>}
-                  isMulti
-                  className="select-category"
-                  onChange={this.handleCategoryChange}
-                  options={categoryList}
-                  styles={colourStyles}
-              />
-              <Select
-                  value={selectedSubcription}
-                  placeholder={<div>Select Subscription Status</div>}
-                  isMulti
-                  isDisabled={!subsEnabled}
-                  className="select-subscription"
-                  onChange={this.handleSubscriptionChange}
-                  options={SubscriptionList}
-                  styles={colourStyles}
-              />
-            <input type="text" id="subject" name="subject"  placeholder="Subject" onChange={(e) => this.handleTextChange(e,'subject')}/>
-            <input type="text" id="from-email" name="from-email" value={fromEmail} placeholder="From (email)" onChange={(e) => this.handleTextChange(e,'from-email')}/>
-            <input type="text" id="from-name" name="from-name" value={fromName} placeholder="From (name)" onChange={(e) => this.handleTextChange(e,'from-name')}/>   
-            <button className="btn save" disabled={condition} onClick={this.onSave}>Send</button>
-            {/* {image && <img src={image} alt="ds" width="100px" height="100px"/>} */}
-            </>:
-            <>
-             <input type="text" id="title" name="title"  placeholder="Title" onChange={(e) => this.handleBlogTextChange(e,'title')}/>
-             <input type="text" id="sub_title" name="sub_title"  placeholder="Sub Title" onChange={(e) => this.handleBlogTextChange(e,'sub_title')}/>
-             <input type="text" id="author" name="author"  placeholder="Author" onChange={(e) => this.handleBlogTextChange(e,'author')}/>
-                <div className="flex-radio">
-                  <div>
-                  <input type="radio" value="Yes" name="radio" id="radio1" className="radio" checked={selectedRadioOption === "Yes"} onChange={this.radioChange}/>
-                  <label className="radio-option" For="radio1">Add Image url</label>
-                  </div>
-                  <div>
-                  <input type="radio" value="No" name="radio" id="radio2" className="radio" checked={selectedRadioOption === "No"} onChange={this.radioChange}/>
-                  <label className="radio-option" For="radio2">Upload Image</label>
-                  </div>
-                </div>
-             {selectedRadioOption === "Yes" && <input type="text" id="url" name="url" value={blogImgUrl} placeholder="Image URL" onChange={(e) => this.handleBlogTextChange(e,'url')}/>}
-             {selectedRadioOption === "No" && <input type="file" id="upload" onChange= {(e) => this.onUpload(e)} />}
-             {selectedRadioOption === "Yes" && 
-             <img src={blogImgUrl} onError={this.onError} width="50px" height="50px" style={{display:'none'}} alt="img"/>}
-                {((imageURlErrored && selectedRadioOption === "Yes")) && <div className="file-msg">Please add Valid Image URL</div>}
-                {(imageError && selectedRadioOption === 'No') && <div className="file-msg">Please make sure your file is in png, jpeg or jpg format and less than 3 MB</div>}
-             <button className="btn save" disabled={blogCondition} onClick={this.onSaveBlog}>Generate</button>
-            </>}
+                <Email 
+                selectedOption={selectedOption}
+                handleChange={this.handleChange}
+                cityData={cityData}
+                colourStyles={colourStyles}
+                selectedCategoryOption={selectedCategoryOption}
+                handleCategoryChange={this.handleCategoryChange}
+                categoryList={categoryList}
+                selectedSubcription={selectedSubcription}
+                subsEnabled={subsEnabled}
+                handleSubscriptionChange={this.handleSubscriptionChange}
+                SubscriptionList={SubscriptionList}
+                handleTextChange={this.handleTextChange}
+                onSave={this.onSave}
+                condition={condition}
+                fromEmail={fromEmail}
+                fromName={fromName}
+                />
+            //     <>
+            //     <Select
+            //       value={selectedOption}
+            //       placeholder={<div>Select City</div>}
+            //       isMulti
+            //       className="select-city"
+            //       onChange={this.handleChange}
+            //       options={cityData}
+            //       styles={colourStyles}
+            //   />
+            //   <Select
+            //       value={selectedCategoryOption}
+            //       placeholder={<div>Select Category</div>}
+            //       isMulti
+            //       className="select-category"
+            //       onChange={this.handleCategoryChange}
+            //       options={categoryList}
+            //       styles={colourStyles}
+            //   />
+            //   <Select
+            //       value={selectedSubcription}
+            //       placeholder={<div>Select Subscription Status</div>}
+            //       isMulti
+            //       isDisabled={!subsEnabled}
+            //       className="select-subscription"
+            //       onChange={this.handleSubscriptionChange}
+            //       options={SubscriptionList}
+            //       styles={colourStyles}
+            //   />
+            // <input type="text" id="subject" name="subject"  placeholder="Subject" onChange={(e) => this.handleTextChange(e,'subject')}/>
+            // <input type="text" id="from-email" name="from-email" value={fromEmail} placeholder="From (email)" onChange={(e) => this.handleTextChange(e,'from-email')}/>
+            // <input type="text" id="from-name" name="from-name" value={fromName} placeholder="From (name)" onChange={(e) => this.handleTextChange(e,'from-name')}/>   
+            // <button className="btn save" disabled={condition} onClick={this.onSave}>Send</button>
+            // {/* {image && <img src={image} alt="ds" width="100px" height="100px"/>} */}
+            // </>
+            :
+            selectedType === 'blog' ? 
+            <Blog
+            handleBlogTextChange={this.handleBlogTextChange}
+            selectedRadioOption={selectedRadioOption}
+            radioChange={this.radioChange}
+            onUpload={this.onUpload}
+            blogImgUrl={blogImgUrl}
+            onError={this.onError}
+            onSaveBlog={this.onSaveBlog}
+            imageURlErrored={imageURlErrored}
+            imageError={imageError}
+            blogCondition={blogCondition} 
+            />
+            // <>
+            //  <input type="text" id="title" name="title"  placeholder="Title" onChange={(e) => this.handleBlogTextChange(e,'title')}/>
+            //  <input type="text" id="sub_title" name="sub_title"  placeholder="Sub Title" onChange={(e) => this.handleBlogTextChange(e,'sub_title')}/>
+            //  <input type="text" id="author" name="author"  placeholder="Author" onChange={(e) => this.handleBlogTextChange(e,'author')}/>
+            //     <div className="flex-radio">
+            //       <div>
+            //       <input type="radio" value="Yes" name="radio" id="radio1" className="radio" checked={selectedRadioOption === "Yes"} onChange={this.radioChange}/>
+            //       <label className="radio-option" For="radio1">Add Image url</label>
+            //       </div>
+            //       <div>
+            //       <input type="radio" value="No" name="radio" id="radio2" className="radio" checked={selectedRadioOption === "No"} onChange={this.radioChange}/>
+            //       <label className="radio-option" For="radio2">Upload Image</label>
+            //       </div>
+            //     </div>
+            //  {selectedRadioOption === "Yes" && <input type="text" id="url" name="url" value={blogImgUrl} placeholder="Image URL" onChange={(e) => this.handleBlogTextChange(e,'url')}/>}
+            //  {selectedRadioOption === "No" && <input type="file" id="upload" onChange= {(e) => this.onUpload(e)} />}
+            //  {selectedRadioOption === "Yes" && 
+            //  <img src={blogImgUrl} onError={this.onError} width="50px" height="50px" style={{display:'none'}} alt="img"/>}
+            //     {((imageURlErrored && selectedRadioOption === "Yes")) && <div className="file-msg">Please add Valid Image URL</div>}
+            //     {(imageError && selectedRadioOption === 'No') && <div className="file-msg">Please make sure your file is in png, jpeg or jpg format and less than 3 MB</div>}
+            //  <button className="btn save" disabled={blogCondition} onClick={this.onSaveBlog}>Generate</button>
+            // </>
+            : <Appointments onSubmitDate={this.onSubmitDate} />}
                 
                 </section>  
                 <section className="main-editor">
-                <Tabs selected={0}>
+              {selectedType === 'Appointments' ? 
+               scheduleList.length > 0 ? 
+               <div className="table-container">
+                <ReactTable
+                data={scheduleList}
+                columns={columns}
+                // noDataText="No Data Available"
+                // filterable
+                // getTrProps={this.onRowClick}
+                defaultPageSize={5}
+                className="-striped -highlight" />
+               </div>
+               :
+               <div className="not-found">No Appointments were Scheduled</div>
+              :
+              <Tabs selected={0}>
                   <Panel title={EditorName}>
-                  <div className="d-flex">
+                    <PanelContent 
+                    toggleList={toggleList}
+                    selectedType={selectedType}
+                    onToggle={this.onToggle}
+                    onChangeRawHtMl={this.onChangeRawHtMl}
+                    emailText={emailText}
+                    onChange={this.onChange}
+                    buttonHtml={buttonHtml}
+                    rawHtml={rawHtml}
+                    />
+                  {/* <div className="d-flex">
                     <p className="status">{toggleList ? "Raw HTML" : selectedType === 'email' ? "Email Editor" : "Blog Editor"}</p>
                     <label className="switch">
                       <input
@@ -592,10 +802,10 @@ class City extends Component {
                   
                   />
                   }
-                  
+                   */}
                   </Panel>
                   <Panel title="Preview"> <iframe title="preview" srcDoc={footerRender}></iframe></Panel>
-                </Tabs> 
+                </Tabs>}
                   
                 </section>
             </section>

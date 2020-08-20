@@ -1,0 +1,131 @@
+.textFieldOutlined {
+    position: relative;
+    display: inline-block;
+    padding: 6px 0 0 0;
+    overflow: hidden;
+    margin: 0px;
+    /* width: 100%; */
+    width: 380px;
+    margin: auto;
+  }
+  
+  
+  .textFieldOutlined > input
+  {
+    box-sizing: border-box;
+    margin: 0;
+    border: solid 1px lightgray; 
+    border-top-color: transparent;
+    border-radius: 4px;
+    padding: 9px 30px;
+    width: 380px;
+    height: inherit;
+    background-color: color;
+    box-shadow: none; 
+    font-family: inherit;
+    font-size: 14px;
+    line-height: inherit;
+    transition: border 0.2s, box-shadow 0.2s;
+  }
+  
+  
+  .textFieldOutlined > input + span {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    width: 100%;
+    max-height: 100%;
+    color: gray;
+    font-size: 75%;
+    line-height: 15px;
+    cursor: text;
+    transition: color 0.2s, font-size 0.2s, line-height 0.2s;
+  }
+  
+  
+  .textFieldOutlined > input + span::before,
+  .textFieldOutlined > input + span::after {
+    content: "";
+    display: block;
+    box-sizing: border-box;
+    margin-top: 6px;
+    border-top: solid 1px lightgray;
+    min-width: 10px;
+    height: 8px;
+    pointer-events: none;
+    box-shadow: inset 0 1px transparent;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  
+   .textFieldOutlined > input + span::before {
+     margin-right: 4px;
+     border-left: solid 1px transparent;
+     border-radius: 4px 0;
+   }
+  
+   .textFieldOutlined > input + span::after {
+     flex-grow: 1;
+     margin-left: 4px;
+     border-right: solid 1px transparent;
+     border-radius: 0 4px;
+   }
+  
+   .textFieldOutlined > input:focus {
+     border-top-color: transparent;
+     outline: none;
+   }
+
+   .textField {
+    padding: 9px 15px;
+    background: #FFFFFF;
+    border: 1px solid #EFEFEF;
+    box-sizing: border-box;
+    border-radius: 8px;
+  }
+  .react-datepicker__month-container{
+      width: 380px !important;
+  }
+  .react-datepicker__day-name, .react-datepicker__day{
+    width: 2.7rem !important;
+  }
+  .react-datepicker-popper[data-placement^="bottom"] .react-datepicker__triangle{
+    border-bottom-color: #32B265 !important;
+  }
+
+  .react-datepicker__header, .react-datepicker__day--selected, .react-datepicker__day--keyboard-selected,
+  .react-datepicker__day--in-range,
+  .react-datepicker__day--in-selecting-range:hover {
+    background-color: #32B265 !important;
+  }
+    .react-datepicker__day--in-selecting-range {
+        background-color: #32B265 !important;
+        opacity: 0.8 !important;
+    }
+    .react-datepicker__day--in-range:hover {
+      background-color: #32B265 !important;
+    }
+  .react-datepicker-wrapper{
+    width: 100% !important;
+  }
+  .react-datepicker__day-name{
+    color: white !important;
+  }
+  .react-datepicker__month-select, .react-datepicker__year-select{
+    height: 25px;
+    border: none;
+  }
+  .react-datepicker__month-select:focus, .react-datepicker__year-select:focus,
+  .react-datepicker__month-select:hover, .react-datepicker__year-select:hover {
+    outline: none;
+    border:none;
+  }
+  .react-datepicker__header__dropdown{
+    margin-top: 5px;
+  }
+  .react-datepicker__current-month{
+    color:white !important;
+  }
+  .react-datepicker__navigation:focus, .react-datepicker__navigation:hover {
+      outline: none;
+  }

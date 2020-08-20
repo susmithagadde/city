@@ -21,12 +21,16 @@
     width: 100%;
     margin-top: 3%;
 }
+.select-feedback{
+  width:75%;
+  margin-bottom: 10px;
+}
 .select-city, .select-category, .select-subscription, .select-type{
     width: 100%;
     /* margin: auto; */
     margin-bottom: 3%;
 }
-.select-city:focus, .select-category:focus, .select-subscription:focus, .select-type:focus{
+.select-city:focus, .select-category:focus, .select-subscription:focus, .select-type:focus, .select-feedback:focus{
   outline: none !important;
 }
 .table-section {
@@ -164,7 +168,7 @@
  }
 
  @media screen and (max-width: 1270px) and (min-width: 650px) {
-  .select-city, .select-category, .select-subscription, .select-type{
+  .select-city, .select-category, .select-subscription, .select-type, .select-feedback{
     width: 75%;
   }
   input[type=text]{
@@ -177,14 +181,6 @@
     width: 60% !important;
   }
 }
-
-
-  /* @media screen and (max-width: 850px) and (min-width: 600px){
-  .col-75 {
-   width: 100%;
-   margin-top: 0;
- }
-}  */
 
 
  /* validate */
@@ -402,15 +398,11 @@ ul .selected {
 }
 
 input.radio:empty {
-  /* margin-left: -999px; */
   display: none;
 }
 
 /* style label */
 input.radio:empty ~ label {
-	/* position: relative;
-	float: left;
-	line-height: 2.5em; */
 	text-indent: 3.25em;
 	/* margin-top: 2em; */
 	cursor: pointer;
@@ -423,11 +415,6 @@ input.radio:empty ~ label {
 }
 
 input.radio:empty ~ label:before {
-	/* position: absolute;
-	display: block;
-	top: 0;
-	bottom: 0;
-	left: 0; */
   width: 2.5em;
   background: #D1D3D4;
   border-radius: 3px 0 0 3px;
@@ -476,4 +463,50 @@ input.radio:checked ~ label {
 /* radio focus */
 input.radio:focus ~ label:before {
 	box-shadow: 0 0 0 3px #999;
+}
+
+.ReactTable .rt-td{
+  word-break: break-word !important;
+  white-space: unset !important;
+  text-overflow: unset !important;
+}
+.table-container{
+  width:85%;
+}
+.feedback-flex {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.callStatus-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  flex-direction: column;
+}
+.fa-calendar-check-o{
+  cursor: pointer;
+}
+textarea:focus{
+  outline: none;
+}
+
+.attended-btn {
+  background-color: rgb(36, 165, 87);
+  border: 0px;
+  padding: 8px 11px;
+  color: rgb(255, 255, 255);
+  margin: 10px 0px 0px;
+  width: auto;
+  display: block;
+  border-radius: 3px;
+  width: 100px;
+  cursor: pointer;
+}
+.attended-btn:focus{
+  outline: none;
+}
+.not-found {
+  color: gray;
 }
