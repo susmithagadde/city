@@ -209,7 +209,7 @@ class City extends Component {
                 body: jsonFormat  
           }
            
-            fetch('https://dev-api.lotusdew.in/blogs/blog/insert', requestOptions)
+            fetch('https://api.lotusdew.in/blogs/blog/insert', requestOptions)
             .then(res => res.json())
             .then(response => {
                 this.setState({ responseData: response.message, loading:false, error:false})
