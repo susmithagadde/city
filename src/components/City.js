@@ -68,7 +68,6 @@ class City extends Component {
     }
 
     componentDidMount() {
-        
         const finalData = PostData.map((data) => {
           let count = Object.values(data)[0];  
             return {value: { city: data.city, count : count }, label: data.city}
