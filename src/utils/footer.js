@@ -381,13 +381,7 @@ export const getHtmlElement = (mainELe, footerHtml) => {
       </center></body></html>`
 }
 
-export const blogFooter = `<p style="
-font-size: 20px;
-color: #757575;
-font-family: &quot;FreightSansProBook-Regular&quot;;
-">I have developed a strategy where I use advanced data science and machine learning to score corporate governance for really small companies with limited reporting. I am attempting to find multi-baggers and create a high conviction basket which is expected to give venture capital like upside but with the advantage of transparency and liquidity associated with listed companies.</p>
-            
-            
+export const blogFooter = `       
 <h2 classname="check-out" style="
 font-size: 20px;
 ">Check our Listed Venture Capital portfolio on <a href="https://lotusdew.smallcase.com/" target="_blank" rel="noopener noreferrer" style="

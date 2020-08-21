@@ -16,7 +16,7 @@ class Appointments extends Component {
         this.state = {
             startDate: new Date(),
             endDate: new Date(),
-            formatStartDate:moment().format("DD/MM/YYYY"),
+            formatStartDate:moment().subtract(7,'days').format("DD/MM/YYYY"),
             formatEndDate:moment().add(7,'days').format('DD/MM/YYYY'),
         }
     }
@@ -66,6 +66,7 @@ class Appointments extends Component {
             </label>
           );
           const diableFields = !formatEndDate || !formatStartDate;
+          var d = new Date();
         return (
             <div>
                 <DatePicker
@@ -77,7 +78,7 @@ class Appointments extends Component {
                     startDate={startDate}
                     customInput={<ExampleCustomInput />}
                     endDate={endDate}
-                    minDate={new Date()}
+                    minDate={d.setDate(d.getDate() - 7)}
                     showDisabledMonthNavigation
                 />
                 <DatePicker
