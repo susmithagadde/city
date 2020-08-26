@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import  { Redirect, withRouter } from 'react-router-dom';
 import Select from 'react-select';
 import ReactTable from 'react-table-6';
-// import { Editor } from "@tinymce/tinymce-react";
+ import { Editor } from "@tinymce/tinymce-react";
 import moment from 'moment';
 import Tabs from "./Tabs";
 import Modal from "./Modal";
@@ -18,6 +18,7 @@ import Appointments from "./Appointments/Appointments";
 import 'react-table-6/react-table.css'
 import './City.css';
 
+var counter = 0;
 
 class City extends Component {
     constructor(props){
@@ -64,6 +65,8 @@ class City extends Component {
             comments:'',
             callStatus:'',
             savedData:[],
+            imageHtml: '',
+            titleAdded: false,
         }
     }
 
@@ -153,10 +156,12 @@ class City extends Component {
       }
 
       handleBlogTextChange = (e, type) => {
+        let re = /^(http[s]?:\/\/){0,1}(www\.){0,1}[a-zA-Z0-9\.\-]+\.[a-zA-Z]{2,5}[\.]{0,1}/;
         switch (type) {
             case "title": 
               this.setState({
-                blogTitle: e.target.value
+                blogTitle: e.target.value,
+                titleAdded: true,
               });
               break;
             case "sub_title": 
@@ -170,9 +175,10 @@ class City extends Component {
               });
               break;
             case "url": 
+            const isValidURL = re.test(e.target.value);
             this.setState({
               blogImgUrl: e.target.value,
-              imageURlErrored: false,
+              imageURlErrored: !isValidURL,
             });
             break;
             default: 
@@ -181,6 +187,7 @@ class City extends Component {
           }; 
       }
 
+
       onSaveBlog = () => {
         const {  toggleList, rawHtml, footerRender, image,
                 blogTitle, blogSubTitle, blogAuthor, blogImgUrl, selectedRadioOption } = this.state;
@@ -188,13 +195,14 @@ class City extends Component {
           const today = moment();
           const format = moment(today).format("MMM DD, YYYY");
           const url = selectedRadioOption === "Yes" ? blogImgUrl: image;
+          //selectedRadioOption === "Yes" ? "url": "image",
           const totalData = {
-            blog_title: blogTitle,
-            blog_updated_on: format,
-            blog_sub_title: blogSubTitle,
-            blog_author: blogAuthor,
-            blog_content:htmlString,
-            image_type: selectedRadioOption === "Yes" ? "url": "image",
+            title: blogTitle.split(" ").join("-"),
+            updated_on: format,
+            sub_title: blogSubTitle,
+            author: blogAuthor,
+            content:htmlString,
+            image_type: "url",
             url: url,
         }
 
@@ -207,8 +215,8 @@ class City extends Component {
                   'Content-Type': 'application/json'},
                 body: jsonFormat  
           }
-           
-            fetch('https://api.lotusdew.in/blogs/blog/insert', requestOptions)
+           // https://api.lotusdew.in/
+            fetch('http://localhost:5000/blogs/blog/insert', requestOptions)
             .then(res => res.json())
             .then(response => {
                 this.setState({ responseData: response.message, loading:false, error:false})
@@ -342,6 +350,9 @@ class City extends Component {
 
        onUpload = e => {
         //  var url = URL.createObjectURL(e.target.files[0]);
+        const { blogTitle } = this.state;
+        // if(blogTitle !== ''){
+        const title =  blogTitle.split(" ").join("-");
          var self = this;
          var reader = new FileReader();
          var file = e.target.files[0];
@@ -350,10 +361,13 @@ class City extends Component {
          var iFileSize = file.size/1024/1024;
           if (( sFileExtension === "PNG" || sFileExtension === "JPEG" ||  sFileExtension === "JPG"  ) && iFileSize < 3 ) {
               reader.onload = function(upload) {
-                self.setState({
-                    image: upload.target.result,
-                    imageError: false,
-                });
+                const totalData = {
+                  title: title,
+                  image: upload.target.result,
+              }
+              const jsonFormat =  JSON.stringify(totalData);
+               self.getImageUrl('blog-img', jsonFormat);
+                
             };
           }
           else{
@@ -365,7 +379,87 @@ class City extends Component {
             };
           }
          
+       reader.readAsDataURL(file);
+      //   }
+      //   else{
+      //     this.setState({titleAdded: false})
+      //  }    
+       }
+
+       getImageUrl = (type, jsonFormat) => {
+        this.setState({ loading: true });
+          let requestOptions = {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'},
+              body: jsonFormat  
+          }
+          fetch('https://m73hh8wqb2.execute-api.ap-south-1.amazonaws.com/upload_blog', requestOptions)
+          .then(res => res.json())
+          .then(response => {
+          if(type === 'content'){
+            const images = `<img src=${response.url} alt="img" width="500px" height="300px" />`;
+            this.setState({ 
+              responseData: response.url,
+              imageHtml: images,
+              emailText:  images + this.state.emailText,
+              footerRender: images + this.state.footerRender + blogFooter,
+              imageError: false, 
+              loading:false, 
+              error:false
+            })
+          }
+          else{
+              this.setState({
+                image: response.url,
+                imageError: false,
+                loading:false, 
+                error:false
+            });
+          }
+          }).catch(error => {
+            this.setState({loading:false, error:true, responseData: error.message})
+        });
+       }
+
+       onUploadMultiImages = e => {
+        //  var url = URL.createObjectURL(e.target.files[0]);
+        const { blogTitle } = this.state;
+        // if(blogTitle !== ''){
+         const title =  blogTitle.split(" ").join("-");
+         this.setState({titleAdded: true});
+         var self = this;
+         var reader = new FileReader();
+         var file = e.target.files[0];
+         var sFileName = file.name;
+         var sFileExtension = sFileName.split(".")[1].toUpperCase();
+         var iFileSize = file.size/1024/1024;
+          if (( sFileExtension === "PNG" || sFileExtension === "JPEG" ||  sFileExtension === "JPG"  )) {
+              reader.onload = function(upload) {
+                counter = counter + 1;
+                const totalData = {
+                  // title: title,
+                  image: upload.target.result,
+              }
+              const jsonFormat =  JSON.stringify(totalData);
+               self.getImageUrl('content', jsonFormat);
+            };
+          }
+          else{
+              reader.onload = function(upload) {
+                self.setState({
+                    image: '',
+                    imageError: true,
+                    imageHtml:'',
+                });
+            };
+          }
+         
        reader.readAsDataURL(file);    
+        // }
+        // else{
+        //    this.setState({titleAdded: false})
+        // }
        }
 
       radioChange = (e) => {
@@ -376,10 +470,15 @@ class City extends Component {
 
       onError = () => {
         const { imageURlErrored, blogImgUrl } = this.state;
-        if (!imageURlErrored && blogImgUrl) {
+        if (!imageURlErrored && blogImgUrl !== '') {
           this.setState({
             imageURlErrored: true,
             blogImgUrl: '',
+          });
+        }
+        else if(imageURlErrored){
+          this.setState({
+            imageURlErrored: true,
           });
         }
       }
@@ -479,7 +578,7 @@ class City extends Component {
 
     render() { 
         const { selectedOption, selectedRadioOption, imageURlErrored, footerRender, rawHtml, image, selectedType, typeList, emailText, toggleList, cityData, matchData, loading, 
-          responseData, subject, fromName, fromEmail, selectedSentimentType, subscriptionStatus, selectedCategoryOption, category, scheduleList, Sentiment,
+          responseData, subject, titleAdded,  fromName, fromEmail, selectedSentimentType, subscriptionStatus, selectedCategoryOption, category, scheduleList, Sentiment,
           selectedSubcription, subsEnabled, savedData, comments, imageError, blogTitle, blogSubTitle, blogAuthor, blogImgUrl, callStatus, attendedId, } = this.state; 
          const types =  typeList.map(list => {return {value: list, label: list}});
          const feedbackTypes =  Sentiment.map(list => {return {value: list, label: list}});
@@ -685,8 +784,10 @@ class City extends Component {
             <Blog
             handleBlogTextChange={this.handleBlogTextChange}
             selectedRadioOption={selectedRadioOption}
+            titleAdded={titleAdded}
             radioChange={this.radioChange}
             onUpload={this.onUpload}
+            onUploadMultiImages={this.onUploadMultiImages}
             blogImgUrl={blogImgUrl}
             onError={this.onError}
             onSaveBlog={this.onSaveBlog}

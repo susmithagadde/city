@@ -34,7 +34,7 @@ class PanelContent extends Component {
                   :
                   <Editor
                   initialValue={emailText && emailText}
-                  
+                  value={emailText}
                    init={{
                      height: 600,
                      statusbar: false,
@@ -54,6 +54,9 @@ class PanelContent extends Component {
                                 var html = '';
                                 editor.insertContent(html);
                               }
+                              editor.on('LoadContent', function(e) {
+                                // console.log('LoadContent event', e);
+                                });
                         
                               editor.ui.registry.addButton('currentdate', {
                                 text: "Insert Button",
