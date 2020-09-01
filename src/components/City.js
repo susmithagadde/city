@@ -67,6 +67,7 @@ class City extends Component {
             savedData:[],
             imageHtml: '',
             titleAdded: false,
+            EditorSet:'',
         }
     }
 
@@ -273,7 +274,7 @@ class City extends Component {
 
       }
 
-      onChange = (e, type) => {
+      onChange = (e, type) => { 
         const { selectedType } = this.state;
         switch (type) {
             case "main-editor": 
@@ -282,12 +283,14 @@ class City extends Component {
                     emailText:  e.target.getContent(),
                     testHtml: getHtmlElement(e.level.content, footerHtml),
                     footerRender:getHtmlElement(e.level.content, footerHtml),
+                    EditorSet:e.target,
                   });
                 }
                 else{ 
                   this.setState({
                     emailText:  e.target.getContent(),
                     footerRender: e.target.getContent() + blogFooter,
+                    EditorSet:e.target,
                   });
                 }
               
@@ -402,7 +405,7 @@ class City extends Component {
             this.setState({ 
               responseData: response.url,
               imageHtml: images,
-              emailText:  images + this.state.emailText,
+              emailText: this.state.EditorSet !== '' ? this.state.EditorSet.setContent(images + this.state.emailText) : images + this.state.emailText,
               footerRender: images + this.state.footerRender + blogFooter,
               imageError: false, 
               loading:false, 
