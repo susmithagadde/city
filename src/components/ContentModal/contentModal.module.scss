@@ -1,0 +1,28 @@
+.contentWrapper {
+  background-color: white;
+  padding: 30px;
+  width: 60vw;
+}
+
+.title {
+  font-size: 24px;
+  padding-bottom: 20px;
+}
+
+.flex {
+  display: flex;
+}
+
+.flexVerticalAlign {
+  display: flex;
+  align-items: center;
+}
+
+.checkboxContainer {
+  margin-left: auto;
+}
+
+.button {
+  height: 40px;
+  cursor: pointer;
+}
