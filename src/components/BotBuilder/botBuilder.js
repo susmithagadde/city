@@ -63,12 +63,13 @@ class BotBuilder extends Component {
     }
 
     updateContent = (isHtml, data, newNodeId=false) => {
-        const { chatData, currentContent } = this.state;
+        const { chatData, currentContent, nodes } = this.state;
         const currentComponentId = currentContent.componentId;
         let clonedChatData = [...chatData];
         let newData = {};
         if(newNodeId) {
             newData = isHtml ? {...defaultInitialSchema, html: data, componentId: newNodeId} : {...defaultInitialSchema, message: data, componentId: newNodeId};
+            this.setState({ nodes: [...nodes, newNodeId]});
             clonedChatData.push(newData);
         } else {
             newData = isHtml ? {...currentContent, html: data } : {...currentContent, message: data};
@@ -139,7 +140,6 @@ class BotBuilder extends Component {
     }
 
     highlightNode = (nodeId) => {
-        console.log('nodeid---', nodeId);
         this.setState({ highlightedNode: nodeId })
     }
 
