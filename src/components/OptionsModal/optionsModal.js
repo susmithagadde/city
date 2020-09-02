@@ -11,6 +11,7 @@ class OptionsModal extends Component {
             newOption: false,
             isHtml: false,
             text: '',
+            htmlId: '',
             nextNode: '',
         }
     }
@@ -19,7 +20,8 @@ class OptionsModal extends Component {
         const { currentOption } = this.props;
         if(Object.keys(currentOption).length > 0){
             if(currentOption.optionHtml) {
-                this.setState({ isHtml: true});
+                const htmlObj = currentOption.optionHtml;
+                this.setState({ isHtml: true, htmlId: htmlObj.id, nextNode: htmlObj.nextId });
             } else {
                 this.setState({ text: currentOption.text, nextNode: currentOption.id});
             }
@@ -45,8 +47,8 @@ class OptionsModal extends Component {
     }
 
     render() {
-        const { closeModal, active, currentContent, nodes } = this.props;
-        const { isHtml, newOption, text, nextNode } = this.state;
+        const { closeModal, active, currentContent, nodes, htmlComponents } = this.props;
+        const { isHtml, newOption, text, nextNode, htmlId } = this.state;
         return <div>
             {active &&
             <Modal
@@ -58,7 +60,7 @@ class OptionsModal extends Component {
                         <div className={style.checkboxContainer}>
                             <input
                                 type="checkbox"
-                                defaultChecked={isHtml}
+                                checked={isHtml}
                                 onChange={() => this.setState({ isHtml: !this.state.isHtml })}
                             /> HTML
                         </div>
@@ -66,12 +68,24 @@ class OptionsModal extends Component {
                     {
                         isHtml ?
                             <div>
-                                <div>html id: {get(currentContent, 'html.id', '')}</div>
-                                <div>onSuccessNode: {get(currentContent, 'html.successId', '')}</div>
-                                <div>onFailureNode: {get(currentContent, 'html.failureId', '')}</div>
+                                <div className={style.flexVerticalAlign}>
+                                    <div className={style.label}>Html id:</div>
+                                    <ReactSelect
+                                        className={style.selectField}
+                                        options={htmlComponents.map(x => ({value: x, label: x}))}
+                                        value={htmlId === "" ? null : {value: htmlId, label: htmlId}}
+                                        placeholder="Select option"
+                                        onChange={(newValue) => {
+                                            this.setState(
+                                                { htmlId: newValue.value }
+                                            )
+                                        }}
+                                    />
+                                </div>
+                                <br />
                             </div> :
                             <div className={style.flexVerticalAlign}>
-                                Option text: &nbsp;&nbsp;
+                                <div className={style.label}>Option text:</div>
                                 <input
                                     type="text"
                                     value={text}
@@ -81,7 +95,7 @@ class OptionsModal extends Component {
                     }
                     <br />
                     <div className={style.flexVerticalAlign}>
-                        Next node: &nbsp;&nbsp;
+                        <div className={style.label}>Next node:</div>
                         <ReactSelect
                             className={style.selectField}
                             options={nodes.map(x => ({value: x, label: x}))}

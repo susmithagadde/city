@@ -1,27 +1,41 @@
 import React, { Component } from 'react';
 import { get } from 'lodash';
-import Select from "react-select";
 import style from './contentModal.module.scss';
 import Modal from "../Modal/modal";
+import ReactSelect from "react-select";
 
 class ContentModal extends Component {
     constructor(props){
         super(props);
         this.state = {
             isHtml: false,
+            newNode: false,
             message: '',
             htmlId: '',
             onSuccessId: '',
             onFailureId: '',
+            newNodeId: '',
         }
     }
 
     componentDidMount() {
         const { currentContent } = this.props;
-        if(currentContent.html) {
-            this.setState({ isHtml: true});
-        } else {
-            this.setState({ message: currentContent.message});
+        console.log('currentContent---', currentContent)
+        if(Object.keys(currentContent).length === 0) {
+            this.setState({ newNode: true });
+        }
+        else {
+            if (currentContent.html) {
+                const htmlObj = currentContent.html;
+                this.setState({
+                    isHtml: true,
+                    htmlId: htmlObj.id,
+                    onSuccessId: htmlObj.successId,
+                    onFailureId: htmlObj.failureId
+                });
+            } else {
+                this.setState({isHtml: false, message: currentContent.message});
+            }
         }
     }
 
@@ -41,19 +55,19 @@ class ContentModal extends Component {
     }
 
     updateContent = () => {
-        const { isHtml, message, htmlId, onSuccessId, onFailureId } = this.state;
+        const { isHtml, message, htmlId, onSuccessId, onFailureId, newNodeId } = this.state;
         const { updateContent, closeModal } = this.props;
         if(isHtml) {
-            updateContent(true, { htmlId, onSuccessId, onFailureId });
+            updateContent(true, { id: htmlId, successId: onSuccessId, failureId: onFailureId }, newNodeId);
         } else {
-            updateContent(false, message);
+            updateContent(false, message, newNodeId);
         }
         closeModal();
     }
 
     render() {
-        const { closeModal, active, currentContent } = this.props;
-        const { isHtml, message } = this.state;
+        const { closeModal, active, currentContent, nodes, htmlComponents } = this.props;
+        const { isHtml, message, htmlId, onSuccessId, onFailureId, newNode, newNodeId } = this.state;
         return <div>
             {active &&
             <Modal
@@ -61,29 +75,86 @@ class ContentModal extends Component {
             >
                 <div className={style.contentWrapper}>
                     <div className={style.flex}>
-                        <div className={style.title}>Node: {currentContent.componentId}</div>
+                        <div className={style.title}>Node: {newNode ? 'create' : currentContent.componentId}</div>
                         <div className={style.checkboxContainer}>
                             <input
                                 type="checkbox"
-                                defaultChecked={isHtml}
+                                checked={isHtml}
                                 onChange={() => this.setState({ isHtml: !this.state.isHtml })}
                             /> HTML
                         </div>
                     </div>
+                    {newNode && <div className={style.flexVerticalAlign}>
+                        <div className={style.label}>Node id:</div>
+                        <input
+                            type="text"
+                            value={newNodeId}
+                            onChange={
+                                (e) =>
+                                    this.setState({ newNodeId: e.target.value })
+                            }
+                        />
+                    </div>}
                     {
                         isHtml ?
                             <div>
-                                <div>html id: {get(currentContent, 'html.id', '')}</div>
-                                <div>onSuccessNode: {get(currentContent, 'html.successId', '')}</div>
-                                <div>onFailureNode: {get(currentContent, 'html.failureId', '')}</div>
+                                <br />
+                                <div className={style.flexVerticalAlign}>
+                                    <div className={style.label}>Html id:</div>
+                                    <ReactSelect
+                                        className={style.selectField}
+                                        options={htmlComponents.map(x => ({value: x, label: x}))}
+                                        value={htmlId === "" ? null : {value: htmlId, label: htmlId}}
+                                        placeholder="Select option"
+                                        onChange={(newValue) => {
+                                            this.setState(
+                                                { htmlId: newValue.value }
+                                            )
+                                        }}
+                                    />
+                                </div>
+                                <br />
+                                <div className={style.flexVerticalAlign}>
+                                    <div className={style.label}>Success Node:</div>
+                                    <ReactSelect
+                                        className={style.selectField}
+                                        options={nodes.map(x => ({value: x, label: x}))}
+                                        value={onSuccessId === "" ? null : {value: onSuccessId, label: onSuccessId}}
+                                        placeholder="Select option"
+                                        onChange={(newValue) => {
+                                            this.setState(
+                                                { onSuccessId: newValue.value }
+                                            )
+                                        }}
+                                    />
+                                </div>
+                                <br />
+                                <div className={style.flexVerticalAlign}>
+                                    <div className={style.label}>Failure Node:</div>
+                                    <ReactSelect
+                                        className={style.selectField}
+                                        options={nodes.map(x => ({value: x, label: x}))}
+                                        value={onFailureId === "" ? null : {value: onFailureId, label: onFailureId}}
+                                        placeholder="Select option"
+                                        onChange={(newValue) => {
+                                            this.setState(
+                                                { onFailureId: newValue.value }
+                                            )
+                                        }}
+                                    />
+                                </div>
+                                <br />
                             </div> :
-                            <div className={style.flexVerticalAlign}>
-                                Message: &nbsp;&nbsp;
-                                <input
-                                    type="text"
-                                    value={message}
-                                    onChange={this.updateMessage}
-                                />
+                            <div>
+                                <br />
+                                <div className={style.flexVerticalAlign}>
+                                    <div className={style.label}>Message:</div>
+                                    <input
+                                        type="text"
+                                        value={message}
+                                        onChange={this.updateMessage}
+                                    />
+                                </div>
                             </div>
                     }
                     <br />

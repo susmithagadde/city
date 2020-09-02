@@ -1,7 +1,8 @@
 .botBuilderWrapper {
+  width: 100%;
   table {
-    border-collapse: collapse;
     width: 100%;
+    border-collapse: collapse;
   }
 
   table, th, td {
@@ -61,18 +62,24 @@
   margin: 3px;
   font-size: 12px;
   border-radius: 3px;
+  width: 120px;
 }
 
 .optionText {
   width: 100%;
   padding-right: 10px;
+  color: #00688B;
+  &:hover {
+    text-decoration: underline;
+    cursor: pointer;
+  }
 }
 
 .optionIconContainer {
   cursor: pointer;
   margin-left: auto;
   &:hover {
-    background: rgb(255, 189, 173);
+    background: #32b265;
   }
 }
 
@@ -96,8 +103,36 @@
 }
 
 .jsonViewer {
-  //border: 1px solid black;
+  border: 1px solid black;
+  padding: 10px;
   text-align: left;
   max-height: 500px;
   overflow: auto;
+}
+
+.tag {
+  background: #32b265;
+  border-radius: 2px;
+  font-size: 10px;
+  padding: 2px;
+  width: 30px;
+  color: white;
+}
+
+.table {
+  table-layout: fixed;
+}
+
+.newNodeBtn {
+  margin-right: auto;
+  height: 30px;
+}
+
+.optionsWrapper {
+  display: flex;
+  overflow: auto;
+}
+
+.highlightRow {
+  background: #79CDCD;
 }

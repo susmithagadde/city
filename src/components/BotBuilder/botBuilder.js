@@ -1,34 +1,53 @@
 import React, { Component } from 'react';
-import ReactJson from 'react-json-view'
+import ReactJson from 'react-json-view';
+import axios from 'axios';
 import { MdEdit, MdClose, MdAddCircleOutline } from 'react-icons/md';
-import { chatJson, nodes, htmlComponents } from "../../constants/mock-api";
 import style from './botBuilder.module.scss';
 import ContentModal from "../ContentModal/contentModal";
 import OptionsModal from "../OptionsModal/optionsModal";
+
+const defaultInitialSchema = {
+    user: "bot",
+    message: "Hi there! How can I help?",
+    options: [],
+    componentId: "welcomeMsg"
+};
 
 class BotBuilder extends Component {
     constructor(props){
         super(props);
         this.state = {
-            chatData: [{
-                user: "bot",
-                message: "Hi there! How can I help?",
-                options: [
-                    // { text: "I want to open an account", id: "openAccount", optionId: 'option-open-account' },
-                    // { text: "Test", id: "emailVerification", optionId: 'option-test' },
-                ],
-                componentId: "welcomeMsg"
-            }],
+            chatJson: {},
+            nodes: [],
+            htmlComponents: [],
+            chatData: [defaultInitialSchema],
             contentEditorActive: false,
             optionsEditorActive: false,
             currentContent: {},
             currentOption: {},
             viewType: 'table',
+            highlightedNode: '',
         }
     }
 
+    componentDidMount() {
+        this.getDbSchema();
+    }
+
+    getDbSchema = () => {
+        axios.get('https://chat-crm.lotusdew.in/chatbot/get')
+            .then((res) => {
+                const response = res.data;
+                console.log('response.data==', response.data)
+                this.setState({ chatJson: response.data, htmlComponents: response.htmlComponents, nodes: response.nodes, chatData: Object.values(response.data) });
+            })
+            .catch((error) => {
+                console.log('error---', error)
+            });
+    }
+
     showContentEditor = (contentData) => {
-        this.setState({ contentEditorActive: true, currentContent: contentData});
+        this.setState({ contentEditorActive: true, currentContent: contentData });
     }
 
     hideContentEditor = () => {
@@ -43,30 +62,50 @@ class BotBuilder extends Component {
         this.setState({ optionsEditorActive: false, currentOption: {}});
     }
 
-    updateContent = (isHtml, data) => {
+    updateContent = (isHtml, data, newNodeId=false) => {
         const { chatData, currentContent } = this.state;
         const currentComponentId = currentContent.componentId;
-        const newData = {...currentContent, message: data};
-        const idx = chatData.findIndex(x => x.componentId === currentComponentId);
         let clonedChatData = [...chatData];
-        clonedChatData.splice(idx, 1, newData);
+        let newData = {};
+        if(newNodeId) {
+            newData = isHtml ? {...defaultInitialSchema, html: data, componentId: newNodeId} : {...defaultInitialSchema, message: data, componentId: newNodeId};
+            clonedChatData.push(newData);
+        } else {
+            newData = isHtml ? {...currentContent, html: data } : {...currentContent, message: data};
+            if(!isHtml) {
+                delete newData.html;
+            }
+            const idx = chatData.findIndex(x => x.componentId === currentComponentId);
+            clonedChatData.splice(idx, 1, newData);
+        }
+
         this.setState({ chatData: clonedChatData});
     }
 
     updateOption = (isHtml, newOption, data, nextNode) => {
-        const { chatData, currentContent, currentOption } = this.state;
+        const { chatData, currentContent, currentOption, chatJson } = this.state;
         let currentOptionList = currentContent.options || [];
         const currentComponentId = currentContent.componentId;
         let clonedChatData = [...chatData];
         if(newOption) {
-            const optionObj = {
-                text: data, id: nextNode, optionId: `option-${nextNode}`,
+            let optionObj = {
+                text: data, id: nextNode, optionId: `option-${nextNode}`
+            }
+            if(isHtml) {
+                optionObj = {
+                    text: '', id: data, optionId: `option-${nextNode}`, optionHtml: { id: data, nextId: nextNode }
+                }
             }
             currentOptionList.push(optionObj);
         } else {
             const currentOptionId = currentOption.optionId;
-            const optionObj = {
+            let optionObj = {
                 text: data, id: nextNode, optionId: currentOptionId,
+            }
+            if(isHtml) {
+                optionObj = {
+                    text: '', id: data, optionId: currentOptionId, optionHtml: { id: data, nextId: nextNode }
+                }
             }
             const optionIdx = currentOptionList.findIndex(x => x.optionId === currentOptionId);
             currentOptionList.splice(optionIdx, 1, optionObj);
@@ -99,14 +138,22 @@ class BotBuilder extends Component {
         this.setState({ optionsEditorActive: true, currentContent: contentData});
     }
 
+    highlightNode = (nodeId) => {
+        console.log('nodeid---', nodeId);
+        this.setState({ highlightedNode: nodeId })
+    }
+
     render() {
-        const { chatData, contentEditorActive, optionsEditorActive, currentContent, currentOption, viewType } = this.state;
+        const { chatData, contentEditorActive, optionsEditorActive, currentContent,
+            currentOption, viewType, nodes, htmlComponents, highlightedNode } = this.state;
         return <div className={style.botBuilderWrapper}>
             {contentEditorActive && <ContentModal
                 active={contentEditorActive}
                 closeModal={this.hideContentEditor}
                 updateContent={this.updateContent}
                 currentContent={currentContent}
+                nodes={nodes}
+                htmlComponents={htmlComponents}
             />}
             {optionsEditorActive && <OptionsModal
                 active={optionsEditorActive}
@@ -115,8 +162,17 @@ class BotBuilder extends Component {
                 currentContent={currentContent}
                 currentOption={currentOption}
                 nodes={nodes}
+                htmlComponents={htmlComponents}
             />}
+            <div className={style.flex}>
+            </div>
             <div className={`${style.flexHorizontalAlign} ${style.tabPosition}`}>
+
+                <div className={style.newNodeBtn}>
+                    <button onClick={() => this.showContentEditor({}) }>New node</button> &nbsp;
+                    <button onClick={() => this.setState({ chatData: [defaultInitialSchema] })}>New schema</button> &nbsp;
+                    <button onClick={this.getDbSchema}>DB schema</button>
+                </div>
                 <div
                     className={`${style.tab} ${viewType === 'table' ? style.selectedMenu : ''}`}
                     onClick={() => this.setState({ viewType: 'table'})}
@@ -130,18 +186,19 @@ class BotBuilder extends Component {
                     JSON viewer
                 </div>
             </div>
-            {viewType === "table" && <table>
+            {viewType === "table" && <table className={style.table}>
                 <tr>
                     <th>node-id</th>
                     <th>content</th>
                     <th>options</th>
                 </tr>
                 {chatData.map(dataRow =>
-                    <tr>
+                    <tr className={`${highlightedNode === dataRow.componentId ? style.highlightRow : ''}`}>
                         <td>{dataRow.componentId}</td>
                         <td>
+                            {dataRow.html && <div className={style.tag}>HTML</div>}
                             <div className={style.flexVerticalAlign}>
-                                <div>{dataRow.message}</div>
+                                <div>{dataRow.html ? dataRow.html.id : dataRow.message}</div>
                                 <div
                                     className={`${style.iconContainer} ${style.flexAllAlign}`}
                                     onClick={() => this.showContentEditor(dataRow)}
@@ -151,10 +208,17 @@ class BotBuilder extends Component {
                             </div>
                         </td>
                         <td>
-                            {dataRow.options.map( option =>
+                            <div className={style.optionsWrapper}>
+                            {(dataRow.options || []).map( option =>
                                 <div className={style.optionContainer}>
+                                    {option.optionHtml && <div className={style.tag}>HTML</div>}
                                     <div className={style.flexVerticalAlign}>
-                                        <div className={style.optionText}>{option.text}</div>
+                                        <div
+                                            className={style.optionText}
+                                            onClick={() => this.highlightNode(option.optionHtml ? option.optionHtml.nextId : option.id)}
+                                        >
+                                            {option.optionHtml ? option.optionHtml.id : option.text}
+                                        </div>
                                         <div className={style.flexEnd}>
                                             <div
                                                 className={`${style.optionIconContainer}`}
@@ -173,6 +237,7 @@ class BotBuilder extends Component {
                                 </div>
                             )
                             }
+                            </div>
                             <div
                                 className={style.flexHorizontalAlign}
                                 onClick={() => this.addOption(dataRow)}
