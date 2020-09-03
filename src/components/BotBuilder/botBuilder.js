@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
 import ReactJson from 'react-json-view';
 import axios from 'axios';
 import { MdEdit, MdClose, MdAddCircleOutline } from 'react-icons/md';
 import style from './botBuilder.module.scss';
 import ContentModal from "../ContentModal/contentModal";
 import OptionsModal from "../OptionsModal/optionsModal";
+import {reorderNodes} from "../../utils/botBuilder";
 
 const defaultInitialSchema = {
     user: "bot",
@@ -38,7 +40,8 @@ class BotBuilder extends Component {
         axios.get('https://chat-crm.lotusdew.in/chatbot/get')
             .then((res) => {
                 const response = res.data;
-                console.log('response.data==', response.data)
+                // const orderedChat = reorderNodes(response.data);
+                // this.setState({ chatJson: response.data, htmlComponents: response.htmlComponents, nodes: response.nodes, chatData: orderedChat });
                 this.setState({ chatJson: response.data, htmlComponents: response.htmlComponents, nodes: response.nodes, chatData: Object.values(response.data) });
             })
             .catch((error) => {
@@ -139,8 +142,14 @@ class BotBuilder extends Component {
         this.setState({ optionsEditorActive: true, currentContent: contentData});
     }
 
-    highlightNode = (nodeId) => {
+    highlightNode = (nodeId, componentId) => {
         this.setState({ highlightedNode: nodeId })
+        this.handleScrollToElement(componentId);
+    }
+
+    handleScrollToElement = (componentId) => {
+        const tesNode = ReactDOM.findDOMNode(this.refs[`${'nodeRow'-componentId}`]);
+        window.scrollTo(0, tesNode.offsetTop);
     }
 
     render() {
@@ -193,7 +202,10 @@ class BotBuilder extends Component {
                     <th>options</th>
                 </tr>
                 {chatData.map(dataRow =>
-                    <tr className={`${highlightedNode === dataRow.componentId ? style.highlightRow : ''}`}>
+                    <tr
+                        ref={`${'nodeRow'-dataRow.componentId}`}
+                        className={`${highlightedNode === dataRow.componentId ? style.highlightRow : ''}`}
+                    >
                         <td>{dataRow.componentId}</td>
                         <td>
                             {dataRow.html && <div className={style.tag}>HTML</div>}
@@ -215,7 +227,7 @@ class BotBuilder extends Component {
                                     <div className={style.flexVerticalAlign}>
                                         <div
                                             className={style.optionText}
-                                            onClick={() => this.highlightNode(option.optionHtml ? option.optionHtml.nextId : option.id)}
+                                            onClick={() => this.highlightNode(option.optionHtml ? option.optionHtml.nextId : option.id, dataRow.componentId)}
                                         >
                                             {option.optionHtml ? option.optionHtml.id : option.text}
                                         </div>
