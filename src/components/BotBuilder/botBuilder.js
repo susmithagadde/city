@@ -40,9 +40,9 @@ class BotBuilder extends Component {
         axios.get('https://chat-crm.lotusdew.in/chatbot/get')
             .then((res) => {
                 const response = res.data;
-                // const orderedChat = reorderNodes(response.data);
-                // this.setState({ chatJson: response.data, htmlComponents: response.htmlComponents, nodes: response.nodes, chatData: orderedChat });
-                this.setState({ chatJson: response.data, htmlComponents: response.htmlComponents, nodes: response.nodes, chatData: Object.values(response.data) });
+                const orderedChat = reorderNodes(response.data);
+                this.setState({ chatJson: response.data, htmlComponents: response.htmlComponents, nodes: response.nodes, chatData: orderedChat });
+                // this.setState({ chatJson: response.data, htmlComponents: response.htmlComponents, nodes: response.nodes, chatData: Object.values(response.data) });
             })
             .catch((error) => {
                 console.log('error---', error)
@@ -197,15 +197,18 @@ class BotBuilder extends Component {
             </div>
             {viewType === "table" && <table className={style.table}>
                 <tr>
+                    <th style={{ width: '50px'}}>No</th>
                     <th>node-id</th>
                     <th>content</th>
                     <th>options</th>
                 </tr>
-                {chatData.map(dataRow =>
+                {chatData.map((dataRow, idx) =>
                     <tr
+                        key={idx}
                         ref={`${'nodeRow'-dataRow.componentId}`}
                         className={`${highlightedNode === dataRow.componentId ? style.highlightRow : ''}`}
                     >
+                        <td>{idx+1}</td>
                         <td>{dataRow.componentId}</td>
                         <td>
                             {dataRow.html && <div className={style.tag}>HTML</div>}
@@ -221,8 +224,8 @@ class BotBuilder extends Component {
                         </td>
                         <td>
                             <div className={style.optionsWrapper}>
-                            {(dataRow.options || []).map( option =>
-                                <div className={style.optionContainer}>
+                            {(dataRow.options || []).map( (option, idx) =>
+                                <div className={style.optionContainer} key={idx}>
                                     {option.optionHtml && <div className={style.tag}>HTML</div>}
                                     <div className={style.flexVerticalAlign}>
                                         <div

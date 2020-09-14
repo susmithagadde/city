@@ -12,10 +12,25 @@ export const reorderNodes = (data) => {
         const firstOption = options[0];
         if(visited.indexOf(firstOption) === -1) {
             visited.push(firstOption);
-            let newNode = data[firstOption];
+            let newNode = data[firstOption] || {};
             orderedList.push(newNode);
+            const currentHtmlNodes = [];
+            if (newNode.html) {
+                if(newNode.html.successId) {
+                    currentHtmlNodes.push(newNode.html.successId)
+                }
+                if(newNode.html.failureId) {
+                    currentHtmlNodes.push(newNode.html.failureId)
+                }
+                if(newNode.html.otherId1) {
+                    currentHtmlNodes.push(newNode.html.otherId1)
+                }
+                if(newNode.html.otherId2) {
+                    currentHtmlNodes.push(newNode.html.otherId2)
+                }
+            }
             currentOptions = (newNode.options || []).map(z => z.optionHtml ? z.optionHtml.nextId : z.id);
-            options = [...options, ...currentOptions];
+            options = [...options, ...currentHtmlNodes, ...currentOptions];
         }
         options.shift();
     }
