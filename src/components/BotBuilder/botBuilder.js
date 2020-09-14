@@ -6,7 +6,8 @@ import { MdEdit, MdClose, MdAddCircleOutline } from 'react-icons/md';
 import style from './botBuilder.module.scss';
 import ContentModal from "../ContentModal/contentModal";
 import OptionsModal from "../OptionsModal/optionsModal";
-import {reorderNodes} from "../../utils/botBuilder";
+import SaveSchemaModal from "../SaveSchemaModal/saveSchemaModal";
+import {createJson, reorderNodes} from "../../utils/botBuilder";
 
 const defaultInitialSchema = {
     user: "bot",
@@ -25,6 +26,7 @@ class BotBuilder extends Component {
             chatData: [defaultInitialSchema],
             contentEditorActive: false,
             optionsEditorActive: false,
+            saveSchemaModalActive: false,
             currentContent: {},
             currentOption: {},
             viewType: 'table',
@@ -47,6 +49,14 @@ class BotBuilder extends Component {
             .catch((error) => {
                 console.log('error---', error)
             });
+    }
+
+    showSaveSchemaModal = () => {
+        this.setState({ saveSchemaModalActive: true });
+    }
+
+    hideSaveSchemaModal = () => {
+        this.setState({ saveSchemaModalActive: false });
     }
 
     showContentEditor = (contentData) => {
@@ -152,9 +162,28 @@ class BotBuilder extends Component {
         window.scrollTo(0, tesNode.offsetTop);
     }
 
+    updateJson = (createdBy, jsonName) => {
+        const { chatJson, chatData } = this.state;
+        const updatedJson = createJson(chatJson, chatData);
+        const obj = {
+            name: jsonName,
+            created_by: createdBy,
+            data: updatedJson
+        }
+        axios.post('https://chat-crm.lotusdew.in/chatbot/insert', obj)
+            .then((res) => {
+                this.hideSaveSchemaModal();
+                alert('json updated');
+            })
+            .catch((error) => {
+                console.log('error---', error)
+            });
+        console.log('obj==', obj)
+    }
+
     render() {
         const { chatData, contentEditorActive, optionsEditorActive, currentContent,
-            currentOption, viewType, nodes, htmlComponents, highlightedNode } = this.state;
+            currentOption, viewType, nodes, htmlComponents, highlightedNode, saveSchemaModalActive } = this.state;
         return <div className={style.botBuilderWrapper}>
             {contentEditorActive && <ContentModal
                 active={contentEditorActive}
@@ -173,6 +202,11 @@ class BotBuilder extends Component {
                 nodes={nodes}
                 htmlComponents={htmlComponents}
             />}
+            {saveSchemaModalActive && <SaveSchemaModal
+                active={saveSchemaModalActive}
+                closeModal={this.hideSaveSchemaModal}
+                updateJson={this.updateJson}
+            />}
             <div className={style.flex}>
             </div>
             <div className={`${style.flexHorizontalAlign} ${style.tabPosition}`}>
@@ -180,7 +214,8 @@ class BotBuilder extends Component {
                 <div className={style.newNodeBtn}>
                     <button onClick={() => this.showContentEditor({}) }>New node</button> &nbsp;
                     <button onClick={() => this.setState({ chatData: [defaultInitialSchema] })}>New schema</button> &nbsp;
-                    <button onClick={this.getDbSchema}>DB schema</button>
+                    <button onClick={this.getDbSchema}>DB schema</button> &nbsp;
+                    <button onClick={this.showSaveSchemaModal}>Save</button>
                 </div>
                 <div
                     className={`${style.tab} ${viewType === 'table' ? style.selectedMenu : ''}`}

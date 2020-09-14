@@ -36,3 +36,12 @@ export const reorderNodes = (data) => {
     }
     return orderedList;
 }
+
+export const createJson = (chatJson, chatData) => {
+    let newData = {};
+    chatData.forEach((x, idx) => {
+        const key = x.componentId;
+        newData[key] = {...x};
+    })
+    return newData;
+}
