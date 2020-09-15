@@ -69,6 +69,7 @@ class City extends Component {
             savedData:[],
             imageHtml: '',
             titleAdded: false,
+            EditorSet:'',
         }
     }
 
@@ -275,31 +276,33 @@ class City extends Component {
 
     }
 
-    onChange = (e, type) => {
+      onChange = (e, type) => {
         const { selectedType } = this.state;
         switch (type) {
-            case "main-editor":
+            case "main-editor": 
                 if(selectedType === 'email'){
-                    this.setState({
-                        emailText:  e.target.getContent(),
-                        testHtml: getHtmlElement(e.level.content, footerHtml),
-                        footerRender:getHtmlElement(e.level.content, footerHtml),
-                    });
+                  this.setState({
+                    emailText:  e.target.getContent(),
+                    testHtml: getHtmlElement(e.level.content, footerHtml),
+                    footerRender:getHtmlElement(e.level.content, footerHtml),
+                    EditorSet:e.target,
+                  });
                 }
-                else{
-                    this.setState({
-                        emailText:  e.target.getContent(),
-                        footerRender: e.target.getContent() + blogFooter,
-                    });
+                else{ 
+                  this.setState({
+                    emailText:  e.target.getContent(),
+                    footerRender: e.target.getContent() + blogFooter,
+                    EditorSet:e.target,
+                  });
                 }
-
-                break;
-            default:
-                console.log("unknown category");
-                break;
-        };
-
-    }
+              
+              break;
+            default: 
+              console.log("unknown category");
+              break;
+          };
+        
+      }
 
     onConfirm =() => {
         this.props.history.push("/");
@@ -394,32 +397,32 @@ class City extends Component {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'},
-            body: jsonFormat
-        }
-        fetch('https://m73hh8wqb2.execute-api.ap-south-1.amazonaws.com/upload_blog', requestOptions)
-            .then(res => res.json())
-            .then(response => {
-                if(type === 'content'){
-                    const images = `<img src=${response.url} alt="img" width="500px" height="300px" />`;
-                    this.setState({
-                        responseData: response.url,
-                        imageHtml: images,
-                        emailText:  images + this.state.emailText,
-                        footerRender: images + this.state.footerRender + blogFooter,
-                        imageError: false,
-                        loading:false,
-                        error:false
-                    })
-                }
-                else{
-                    this.setState({
-                        image: response.url,
-                        imageError: false,
-                        loading:false,
-                        error:false
-                    });
-                }
-            }).catch(error => {
+              body: jsonFormat  
+          }
+          fetch('https://m73hh8wqb2.execute-api.ap-south-1.amazonaws.com/upload_blog', requestOptions)
+          .then(res => res.json())
+          .then(response => {
+          if(type === 'content'){
+            const images = `<img src=${response.url} alt="img" width="500px" height="300px" />`;
+            this.setState({ 
+              responseData: response.url,
+              imageHtml: images,
+              emailText: this.state.EditorSet !== '' ? this.state.EditorSet.setContent(images + this.state.emailText) : images + this.state.emailText,
+              footerRender: images + this.state.footerRender + blogFooter,
+              imageError: false, 
+              loading:false, 
+              error:false
+            })
+          }
+          else{
+              this.setState({
+                image: response.url,
+                imageError: false,
+                loading:false, 
+                error:false
+            });
+          }
+          }).catch(error => {
             this.setState({loading:false, error:true, responseData: error.message})
         });
     }

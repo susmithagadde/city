@@ -381,6 +381,10 @@ export const getHtmlElement = (mainELe, footerHtml) => {
       </center></body></html>`
 }
 
+// export const getEditor =(name) => {
+//   return name;
+// }
+
 export const blogFooter = `       
 <h2 classname="check-out" style="
 font-size: 20px;

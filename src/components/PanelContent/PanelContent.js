@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Editor } from "@tinymce/tinymce-react";
 import '../City.css';
+// import { getEditor  } from "../../utils/footer";
 // import Modal from "../Modal";
 
 
@@ -8,9 +9,12 @@ class PanelContent extends Component {
     constructor(props){
         super(props);
         this.state = {
-           
         }
     }
+
+    // componentDidUpdate(){
+    //  const name =  getEditor(this.state.test);
+    // }
     
 
     render() {
@@ -34,7 +38,7 @@ class PanelContent extends Component {
                   :
                   <Editor
                   initialValue={emailText && emailText}
-                  value={emailText}
+                  // value={emailText}
                    init={{
                      height: 600,
                      statusbar: false,
@@ -54,9 +58,10 @@ class PanelContent extends Component {
                                 var html = '';
                                 editor.insertContent(html);
                               }
-                              editor.on('LoadContent', function(e) {
-                                // console.log('LoadContent event', e);
-                                });
+                              //  editor.on('LoadContent', function(e) {
+                              //     // console.log('LoadContent event', e);
+                                  
+                              //    });
                         
                               editor.ui.registry.addButton('currentdate', {
                                 text: "Insert Button",
@@ -71,7 +76,7 @@ class PanelContent extends Component {
                             }
                    }}
                   onChange={(e) => onChange(e, 'main-editor')}
-                  
+                  id='uuid'
                   />
                   }
             </>
