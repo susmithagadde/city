@@ -152,14 +152,13 @@ class BotBuilder extends Component {
         this.setState({ optionsEditorActive: true, currentContent: contentData});
     }
 
-    highlightNode = (nodeId, componentId) => {
+    highlightNode = (nodeId) => {
         this.setState({ highlightedNode: nodeId })
-        this.handleScrollToElement(componentId);
+        this.handleScrollToElement(nodeId);
     }
 
-    handleScrollToElement = (componentId) => {
-        const tesNode = ReactDOM.findDOMNode(this.refs[`${'nodeRow'-componentId}`]);
-        window.scrollTo(0, tesNode.offsetTop);
+    handleScrollToElement = (nodeId) => {
+        document.getElementById(nodeId).scrollIntoView({ behavior: "smooth"});
     }
 
     updateJson = (createdBy, jsonName) => {
@@ -241,6 +240,7 @@ class BotBuilder extends Component {
                     <tr
                         key={idx}
                         ref={`${'nodeRow'-dataRow.componentId}`}
+                        id={dataRow.componentId}
                         className={`${highlightedNode === dataRow.componentId ? style.highlightRow : ''}`}
                     >
                         <td>{idx+1}</td>
@@ -265,7 +265,7 @@ class BotBuilder extends Component {
                                     <div className={style.flexVerticalAlign}>
                                         <div
                                             className={style.optionText}
-                                            onClick={() => this.highlightNode(option.optionHtml ? option.optionHtml.nextId : option.id, dataRow.componentId)}
+                                            onClick={() => this.highlightNode(option.optionHtml ? option.optionHtml.nextId : option.id)}
                                         >
                                             {option.optionHtml ? option.optionHtml.id : option.text}
                                         </div>
