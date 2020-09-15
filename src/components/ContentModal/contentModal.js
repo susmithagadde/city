@@ -14,6 +14,7 @@ class ContentModal extends Component {
             htmlId: '',
             onSuccessId: '',
             onFailureId: '',
+            customId: '',
             newNodeId: '',
         }
     }
@@ -31,7 +32,8 @@ class ContentModal extends Component {
                     isHtml: true,
                     htmlId: htmlObj.id,
                     onSuccessId: htmlObj.successId,
-                    onFailureId: htmlObj.failureId
+                    onFailureId: htmlObj.failureId,
+                    customId: htmlObj.customId,
                 });
             } else {
                 this.setState({isHtml: false, message: currentContent.message});
@@ -55,10 +57,10 @@ class ContentModal extends Component {
     }
 
     updateContent = () => {
-        const { isHtml, message, htmlId, onSuccessId, onFailureId, newNodeId } = this.state;
+        const { isHtml, message, htmlId, onSuccessId, onFailureId, newNodeId, customId } = this.state;
         const { updateContent, closeModal } = this.props;
         if(isHtml) {
-            updateContent(true, { id: htmlId, successId: onSuccessId, failureId: onFailureId }, newNodeId);
+            updateContent(true, { id: htmlId, successId: onSuccessId, failureId: onFailureId, customId }, newNodeId);
         } else {
             updateContent(false, message, newNodeId);
         }
@@ -67,7 +69,7 @@ class ContentModal extends Component {
 
     render() {
         const { closeModal, active, currentContent, nodes, htmlComponents } = this.props;
-        const { isHtml, message, htmlId, onSuccessId, onFailureId, newNode, newNodeId } = this.state;
+        const { isHtml, message, htmlId, onSuccessId, onFailureId, customId, newNode, newNodeId } = this.state;
         return <div>
             {active &&
             <Modal
@@ -139,6 +141,21 @@ class ContentModal extends Component {
                                         onChange={(newValue) => {
                                             this.setState(
                                                 { onFailureId: newValue.value }
+                                            )
+                                        }}
+                                    />
+                                </div>
+                                <br />
+                                <div className={style.flexVerticalAlign}>
+                                    <div className={style.label}>Custom Node:</div>
+                                    <ReactSelect
+                                        className={style.selectField}
+                                        options={nodes.map(x => ({value: x, label: x}))}
+                                        value={customId === "" ? null : {value: customId, label: customId}}
+                                        placeholder="Select option"
+                                        onChange={(newValue) => {
+                                            this.setState(
+                                                { customId: newValue.value }
                                             )
                                         }}
                                     />
