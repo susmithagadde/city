@@ -22,11 +22,8 @@ export const reorderNodes = (data) => {
                 if(newNode.html.failureId) {
                     currentHtmlNodes.push(newNode.html.failureId)
                 }
-                if(newNode.html.otherId1) {
-                    currentHtmlNodes.push(newNode.html.otherId1)
-                }
-                if(newNode.html.otherId2) {
-                    currentHtmlNodes.push(newNode.html.otherId2)
+                if(newNode.html.customId) {
+                    currentHtmlNodes.push(newNode.html.customId)
                 }
             }
             currentOptions = (newNode.options || []).map(z => z.optionHtml ? z.optionHtml.nextId : z.id);
