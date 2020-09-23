@@ -30,16 +30,18 @@ class BotBuilder extends Component {
             currentContent: {},
             currentOption: {},
             viewType: 'table',
+            domain: 'dev',
             highlightedNode: '',
         }
     }
 
     componentDidMount() {
-        this.getDbSchema();
+        this.getDbSchema(true);
     }
 
-    getDbSchema = () => {
-        axios.get('https://chat-crm.lotusdew.in/chatbot/get')
+    getDbSchema = (isDev=true) => {
+        const url = isDev ? 'https://chat-crm.lotusdew.in/dev-chatbot/get' : 'https://chat-crm.lotusdew.in/chatbot/get';
+        axios.get(url)
             .then((res) => {
                 const response = res.data;
                 const orderedChat = reorderNodes(response.data);
@@ -162,14 +164,15 @@ class BotBuilder extends Component {
     }
 
     updateJson = (createdBy, jsonName) => {
-        const { chatJson, chatData } = this.state;
+        const { chatJson, chatData, domain } = this.state;
         const updatedJson = createJson(chatJson, chatData);
         const obj = {
             name: jsonName,
             created_by: createdBy,
             data: updatedJson
-        }
-        axios.post('https://chat-crm.lotusdew.in/chatbot/insert', obj)
+        };
+        const url = domain === 'dev' ? 'https://chat-crm.lotusdew.in/dev-chatbot/insert' : 'https://chat-crm.lotusdew.in/chatbot/insert';
+        axios.post(url, obj)
             .then((res) => {
                 this.hideSaveSchemaModal();
                 alert('json updated');
@@ -177,12 +180,11 @@ class BotBuilder extends Component {
             .catch((error) => {
                 console.log('error---', error)
             });
-        console.log('obj==', obj)
     }
 
     render() {
         const { chatData, contentEditorActive, optionsEditorActive, currentContent,
-            currentOption, viewType, nodes, htmlComponents, highlightedNode, saveSchemaModalActive } = this.state;
+            currentOption, viewType, nodes, htmlComponents, highlightedNode, saveSchemaModalActive, domain } = this.state;
         return <div className={style.botBuilderWrapper}>
             {contentEditorActive && <ContentModal
                 active={contentEditorActive}
@@ -216,6 +218,24 @@ class BotBuilder extends Component {
                     <button onClick={this.getDbSchema}>DB schema</button> &nbsp;
                     <button onClick={this.showSaveSchemaModal}>Save</button>
                 </div>
+                <div
+                    className={`${style.tab} ${domain === 'dev' ? style.selectedMenu : ''}`}
+                    onClick={() => this.setState({ domain: 'dev'}, () => this.getDbSchema(true))}
+                >
+                    Dev
+                </div>
+                <div
+                    className={`${style.tab} ${domain === 'prod' ? style.selectedMenu : ''}`}
+                    onClick={() => this.setState({ domain: 'prod'}, () => this.getDbSchema(false))}
+                >
+                    Prod
+                </div>
+                &nbsp;
+                &nbsp;
+                &nbsp;
+                &nbsp;
+                &nbsp;
+                &nbsp;
                 <div
                     className={`${style.tab} ${viewType === 'table' ? style.selectedMenu : ''}`}
                     onClick={() => this.setState({ viewType: 'table'})}
