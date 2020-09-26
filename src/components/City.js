@@ -243,7 +243,6 @@ class City extends Component {
         })
         const SubsMatch = selectedSubcription ? selectedSubcription.map(data => data.label): [];
         const htmlString = toggleList ? rawHtml: testHtml;
-
         const totalData = {
             subject: subject,
             subscription_status: SubsMatch,
@@ -278,18 +277,18 @@ class City extends Component {
         const { selectedType } = this.state;
         switch (type) {
             case "main-editor": 
-                if(selectedType === 'email'){
+                if(selectedType === 'email'){ //console.log("email", e.level.content);
                   this.setState({
                     emailText:  e.target.getContent(),
-                    testHtml: getHtmlElement(e.level.content, footerHtml),
-                    footerRender:getHtmlElement(e.level.content, footerHtml),
+                    testHtml: getHtmlElement(e.target.getContent(), footerHtml),
+                    footerRender:getHtmlElement(e.target.getContent(), footerHtml),
                     EditorSet:e.target,
                   });
                 }
                 else{ 
                   this.setState({
                     emailText:  e.target.getContent(),
-                    footerRender: e.target.getContent() + blogFooter,
+                    footerRender: e.target.getContent(),
                     EditorSet:e.target,
                   });
                 }
