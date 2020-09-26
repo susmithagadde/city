@@ -1,0 +1,138 @@
+.botBuilderWrapper {
+  width: 100%;
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  table, th, td {
+    border: 1px solid black;
+    text-align: left;
+    padding: 5px;
+  }
+}
+
+.flex {
+  display: flex;
+}
+
+.flexHorizontalAlign {
+  display: flex;
+  justify-content: center;
+}
+
+.flexVerticalAlign {
+  display: flex;
+  align-items: center;
+}
+
+.flexAllAlign {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flexEnd {
+  justify-content: flex-end;
+}
+
+.iconContainer {
+  height: 30px;
+  width: 30px;
+  margin-left: auto;
+
+  &:hover {
+    background: #808080;
+    cursor: pointer;
+    border-radius: 50%;
+  }
+}
+
+.icon {
+  height: 20px;
+  width: 20px;
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.optionContainer {
+  background: #999999;
+  padding: 3px 5px;
+  margin: 3px;
+  font-size: 12px;
+  border-radius: 3px;
+  width: 120px;
+}
+
+.optionText {
+  width: 100%;
+  padding-right: 10px;
+  color: #00688B;
+  &:hover {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+}
+
+.optionIconContainer {
+  cursor: pointer;
+  margin-left: auto;
+  &:hover {
+    background: #32b265;
+  }
+}
+
+.tab {
+  border: 1px solid black;
+  padding: 5px;
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.selectedMenu {
+  background-color: #32b265;
+}
+
+.tabPosition {
+  //position: relative;
+  //top: -30px;
+  margin: 20px;
+  text-align: center  ;
+}
+
+.jsonViewer {
+  border: 1px solid black;
+  padding: 10px;
+  text-align: left;
+  max-height: 500px;
+  overflow: auto;
+}
+
+.tag {
+  background: #32b265;
+  border-radius: 2px;
+  font-size: 10px;
+  padding: 2px;
+  width: 30px;
+  color: white;
+}
+
+.table {
+  table-layout: fixed;
+}
+
+.newNodeBtn {
+  margin-right: auto;
+  height: 30px;
+}
+
+.optionsWrapper {
+  display: flex;
+  overflow: auto;
+}
+
+.highlightRow {
+  background: #79CDCD;
+}
