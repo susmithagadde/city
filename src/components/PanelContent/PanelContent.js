@@ -43,10 +43,10 @@ class PanelContent extends Component {
                      height: 600,
                      statusbar: false,
                      plugins: [
-                      'link image code', 'textcolor',
+                      'link image code', 'textcolor', 'lists',
                      ],
                      placeholder: "Editor",
-                     toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | code | currentdate | forecolor backcolor | Info ',
+                     toolbar: 'undo redo | bold italic | numlist bullist | alignleft aligncenter alignright | code | currentdate | forecolor backcolor | Info ',
                      content_css: 'www.tiny.cloud/css/codepen.min.css',
                      setup: function(editor) { 
                               function insertBtn() {

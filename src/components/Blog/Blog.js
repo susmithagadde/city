@@ -23,19 +23,19 @@ class Blog extends Component {
                 <div className="flex-radio">
                   <div>
                   <input type="radio" value="Yes" name="radio" id="radio1" className="radio" checked={selectedRadioOption === "Yes"} onChange={radioChange}/>
-                  <label className="radio-option" For="radio1">Blog Image url</label>
+                  <label className="radio-option" htmlFor="radio1">Blog Image url</label>
                   </div>
                   <div>
                   <input type="radio" value="No" name="radio" id="radio2" className="radio" checked={selectedRadioOption === "No"} onChange={radioChange}/>
-                  <label className="radio-option" For="radio2">Upload Blog Image</label>
+                  <label className="radio-option" htmlFor="radio2">Upload Blog Image</label>
                   </div>
                 </div>
              {selectedRadioOption === "Yes" && <input type="text" id="url" name="url" value={blogImgUrl} placeholder="Image URL" onChange={(e) => handleBlogTextChange(e,'url')}/>}
              {selectedRadioOption === "No" && <input type="file" id="upload" onChange= {(e) => onUpload(e)} />}
              {/* <input type="file" id="upload" onChange= {(e) => onUploadMultiImages(e)} /> */}
-             <form  id="img-upload-form" method="post" enctype="multipart/form-data">
+             <form  id="img-upload-form" method="post" encType="multipart/form-data">
                 <p>
-                    <label for="upload_imgs" className="button hollow">Upload Images +</label>
+                    <label htmlFor="upload_imgs" className="button hollow">Upload Images +</label>
                     <input className="show-for-sr"  onChange= {(e) => onUploadMultiImages(e)} type="file" id="upload_imgs" name="upload_imgs[]" multiple/>
                 </p>
             </form>
