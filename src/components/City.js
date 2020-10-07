@@ -497,7 +497,7 @@ class City extends Component {
             body: jsonFormat
         }
 
-        fetch('https://dev-api.lotusdew.in/api/schedule-list', requestOptions)
+        fetch('https://api.lotusdew.in/api/schedule-list', requestOptions)
             .then(res => res.json())
             .then(response => {
                 this.setState({ scheduleList: response.data, loading:false, error:false})
@@ -527,7 +527,7 @@ class City extends Component {
             body: jsonFormat
         }
 
-        fetch('https://dev-api.lotusdew.in/api/schedule-update', requestOptions)
+        fetch('https://api.lotusdew.in/api/schedule-update', requestOptions)
             .then(res => res.json())
             .then(response => {
                 this.setState({ responseData: response.message, loading:false, error:false})
@@ -552,7 +552,7 @@ class City extends Component {
                 body: jsonFormat
             }
 
-            fetch('https://dev-api.lotusdew.in/api/schedule-get', requestOptions)
+            fetch('https://api.lotusdew.in/api/schedule-get', requestOptions)
                 .then(res => res.json())
                 .then(response => {
                     this.setState({ savedData: response.data, loading:false, error:false})
