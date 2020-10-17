@@ -14,31 +14,15 @@ class Appointments extends Component {
     constructor(props){
         super(props);
         this.state = {
-            startDate: new Date(),
-            endDate: new Date(),
-            formatStartDate:moment().subtract(7,'days').format("DD/MM/YYYY"),
-            formatEndDate:moment().add(7,'days').format('DD/MM/YYYY'),
+           
         }
     }
 
-    handleChange = (date) => {
-        this.setState({
-            formatStartDate: moment(date).format("DD/MM/YYYY"),
-            startDate: date,
-            formatEndDate: moment(date).format("DD/MM/YYYY"),
-            endDate: date,     
-        });
-      };
-      handleEndDate = date => {
-        this.setState({
-            formatEndDate: moment(date).format("DD/MM/YYYY"),
-            endDate: date,    
-        });
-      }
+
 
     render() {
-        const { startDate, endDate, formatStartDate, formatEndDate  } = this.state;
-        const { onSubmitDate } = this.props;
+        // const { startDate, endDate, formatStartDate, formatEndDate  } = this.state;
+        const { onSubmitDate, handleChange, handleEndDate, startDate, endDate, formatStartDate, formatEndDate } = this.props;
         const ExampleCustomInput = ({ value, onClick }) => (
             <label className='textFieldOutlined'>
             <input
@@ -72,7 +56,7 @@ class Appointments extends Component {
                 <DatePicker
                     selected={startDate}
                     dateFormat="dd/MM/yyyy"
-                    onChange={(date)  => this.handleChange(date)}
+                    onChange={(date)  => handleChange(date)}
                     placeholderText="Select start Date" 
                     selectsStart
                     startDate={startDate}
@@ -85,7 +69,7 @@ class Appointments extends Component {
                     selected={endDate}
                     dateFormat="dd/MM/yyyy"
                     placeholderText="Select End Date" 
-                    onChange={(date)  => this.handleEndDate(date)}
+                    onChange={(date)  => handleEndDate(date)}
                     selectsEnd
                     startDate={startDate}
                     customInput={<ExampleEndDateInput />}

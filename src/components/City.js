@@ -70,6 +70,10 @@ class City extends Component {
             imageHtml: '',
             titleAdded: false,
             EditorSet:'',
+            startDate: new Date(),
+            endDate: new Date(),
+            formatStartDate:moment().subtract(7,'days').format("DD/MM/YYYY"),
+            formatEndDate:moment().add(7,'days').format('DD/MM/YYYY'),
         }
     }
 
@@ -338,13 +342,14 @@ class City extends Component {
     }
 
     handleChangeTypes = selectedOption => {
+        const { formatStartDate } = this.state;
         if(selectedOption.value === 'email'){
             this.setState({footerRender: footerHtml})
         }
         else if(selectedOption.value === 'Appointments') {
             const startDate = new Date();
             const endDate = moment(startDate, "YYYY-MM-DD").add(7, 'days');
-            this.onSubmitDate(startDate, endDate);
+            this.onSubmitDate(formatStartDate, endDate);
         }
         else{
             this.setState({footerRender: blogFooter})
@@ -573,10 +578,26 @@ class City extends Component {
         this.setState({comments: e.target.value});
     }
 
+    handleAppointmentChange = (date) => {
+        this.setState({
+            formatStartDate: moment(date).format("DD/MM/YYYY"),
+            startDate: date,
+            formatEndDate: moment(date).format("DD/MM/YYYY"),
+            endDate: date,     
+        });
+      };
+      handleEndDate = date => {
+        this.setState({
+            formatEndDate: moment(date).format("DD/MM/YYYY"),
+            endDate: date,    
+        });
+      }
+
     render() {
         const { selectedOption, selectedRadioOption, imageURlErrored, footerRender, rawHtml, image, selectedType, typeList, emailText, toggleList, cityData, matchData, loading,
             responseData, subject, titleAdded,  fromName, fromEmail, selectedSentimentType, subscriptionStatus, selectedCategoryOption, category, scheduleList, Sentiment,
-            selectedSubcription, subsEnabled, savedData, comments, imageError, blogTitle, blogSubTitle, blogAuthor, blogImgUrl, callStatus, attendedId, } = this.state;
+            selectedSubcription, subsEnabled, savedData, comments, imageError, blogTitle, blogSubTitle, blogAuthor, blogImgUrl, 
+            startDate, endDate, formatEndDate, formatStartDate, callStatus, attendedId, } = this.state;
         const types =  typeList.map(list => {return {value: list, label: list}});
         const feedbackTypes =  Sentiment.map(list => {return {value: list, label: list}});
         const EditorName = selectedType === 'email' ? 'Email Content': 'Blog Content';
@@ -755,7 +776,16 @@ class City extends Component {
                             imageError={imageError}
                             blogCondition={blogCondition}
                         />}
-                        { selectedType === 'Appointments' &&  <Appointments onSubmitDate={this.onSubmitDate} />}
+                        { selectedType === 'Appointments' &&  
+                        <Appointments 
+                            handleChange={this.handleAppointmentChange} 
+                            handleEndDate={this.handleEndDate} 
+                            onSubmitDate={this.onSubmitDate}
+                            startDate= {startDate}
+                            endDate= {endDate}
+                            formatStartDate= {formatStartDate}
+                            formatEndDate= {formatEndDate}
+                        />}
                         { selectedType === 'Bot builder' &&  <BotBuilderLeftPane />}
 
                     </section>
